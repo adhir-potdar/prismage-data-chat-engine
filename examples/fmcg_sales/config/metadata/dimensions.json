@@ -1,0 +1,13 @@
+{
+  "dimensions": [
+    { "name": "zsm", "aliases": ["zonal sales manager", "zone head", "zonal head"], "db_column": "zsm", "table_affinity": ["sales_rep_primary", "sales_rep_secondary", "product_primary", "product_secondary", "dashboard"], "hierarchy_name": "sales", "hierarchy_level": 1 },
+    { "name": "rsm", "aliases": ["regional sales manager", "region manager", "regional head"], "db_column": "rsm", "table_affinity": ["sales_rep_primary", "sales_rep_secondary", "product_primary", "product_secondary", "dashboard"], "hierarchy_name": "sales", "hierarchy_level": 2 },
+    { "name": "asm", "aliases": ["area sales manager", "area manager"], "db_column": "asm", "table_affinity": ["sales_rep_primary", "sales_rep_secondary", "product_primary", "product_secondary"], "hierarchy_name": "sales", "hierarchy_level": 3 },
+    { "name": "so", "aliases": ["sales officer", "sales executive", "field sales", "sales rep", "sales person"], "db_column": "so", "table_affinity": ["sales_rep_primary", "sales_rep_secondary"], "hierarchy_name": "sales", "hierarchy_level": 4 },
+    { "name": "product", "aliases": ["product name", "item", "sku"], "db_column": "product_name", "table_affinity": ["product_primary", "product_secondary", "sales_rep_primary", "sales_rep_secondary"], "hierarchy_name": "product", "hierarchy_level": 2 },
+    { "name": "brand", "aliases": ["brand name", "product brand"], "db_column": "brand", "table_affinity": ["product_primary", "product_secondary", "sales_rep_primary", "sales_rep_secondary"], "hierarchy_name": "product", "hierarchy_level": 1 },
+    { "name": "category", "aliases": ["product category", "segment", "product segment"], "db_column": "category", "table_affinity": ["product_primary", "product_secondary", "sales_rep_primary", "sales_rep_secondary"], "hierarchy_name": "product", "hierarchy_level": 0 },
+    { "name": "distributor", "aliases": ["distributor name", "distributor_name", "agency"], "db_column": "distributor_name", "table_affinity": ["sales_rep_primary", "sales_rep_secondary"], "hierarchy_name": null, "hierarchy_level": null },
+    { "name": "town", "aliases": ["town name", "city", "location", "market"], "db_column": "town", "table_affinity": ["sales_rep_primary", "sales_rep_secondary"], "hierarchy_name": null, "hierarchy_level": null }
+  ]
+}

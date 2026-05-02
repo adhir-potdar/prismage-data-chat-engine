@@ -1,0 +1,10 @@
+{
+  "formulas": [
+    { "name": "ach_pct_mtd", "display": "Ach % MTD", "expression": "SUM({cymtd}) / NULLIF(SUM({tgt}), 0) * 100", "components": ["cymtd", "tgt"], "runtime_vars": [], "window": false },
+    { "name": "mtd_gr_pct", "display": "MTD Gr %", "expression": "(SUM({cymtd}) / NULLIF(SUM({lymtd}), 0) - 1) * 100", "components": ["cymtd", "lymtd"], "runtime_vars": [], "window": false },
+    { "name": "ytd_ach_pct", "display": "YTD Ach %", "expression": "SUM({ty_ytd}) / NULLIF(SUM({ytd_tgt}), 0) * 100", "components": ["ty_ytd", "ytd_tgt"], "runtime_vars": [], "window": false },
+    { "name": "btd", "display": "BTD", "expression": "SUM({tgt}) - SUM({cymtd})", "components": ["tgt", "cymtd"], "runtime_vars": [], "window": false },
+    { "name": "crr", "display": "CRR", "expression": "SUM({cymtd}) / NULLIF({days_elapsed}, 0) * {total_days}", "components": ["cymtd"], "runtime_vars": ["days_elapsed", "total_days"], "window": false },
+    { "name": "rrr", "display": "RRR", "expression": "(SUM({tgt}) - SUM({cymtd})) / NULLIF({days_remaining}, 0)", "components": ["tgt", "cymtd"], "runtime_vars": ["days_remaining"], "window": false }
+  ]
+}

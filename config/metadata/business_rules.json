@@ -1,0 +1,176 @@
+{
+  "domain_context": "This is a retail and e-commerce business dataset.\nRevenue is the net sales value after discounts. Cost is the cost of goods sold.\nTarget revenue is the planned monthly sales budget.\nMTD = month-to-date (cumulative from the 1st of the month to today).\nYTD = year-to-date (cumulative from Jan 1 to today).\nQTD = quarter-to-date (cumulative from quarter start to today).\nPrev period refers to the same period in the previous year.\nA sales rep or product is underperforming when MTD revenue is below both the monthly target and the previous year's MTD.\nAOV (average order value) = total revenue / number of orders.\nRun rate = projected month-end revenue at the current daily pace.\n",
+  "metric_hints": [
+    { "phrase": "vs target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" } },
+    { "phrase": "below target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" }, "polarity": "negative", "operator": "<" },
+    { "phrase": "above target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" }, "polarity": "positive", "operator": ">" },
+    { "phrase": "vs last year", "maps_to_having": { "metric1": "revenue", "metric2": "prev_revenue" } },
+    { "phrase": "both -ve", "polarity": "negative", "operator": "<" },
+    { "phrase": "both negative", "polarity": "negative", "operator": "<" },
+    { "phrase": "both +ve", "polarity": "positive", "operator": ">" },
+    { "phrase": "both positive", "polarity": "positive", "operator": ">" },
+    { "phrase": "mtd vs target", "maps_to_having": { "metric1": "mtd_revenue", "metric2": "target_revenue" } },
+    { "phrase": "mtd vs last year", "maps_to_having": { "metric1": "mtd_revenue", "metric2": "prev_mtd_revenue" } }
+  ],
+  "having_patterns": [
+    {
+      "type": "vs_average",
+      "description": "Filter rows above or below the average value of a metric",
+      "sql_template": "HAVING {agg}({col}) {op} (SELECT AVG({col}) FROM {table})"
+    },
+    {
+      "type": "gap_to_target",
+      "description": "Rank rows by distance from target, closest first",
+      "sql_template": "HAVING ABS(SUM({tgt_col}) - {agg}({col})) > 0 ORDER BY ABS(SUM({tgt_col}) - {agg}({col})) ASC"
+    },
+    {
+      "type": "metric_comparison",
+      "description": "Filter rows where one metric is above or below another",
+      "sql_template": "HAVING {agg1}({col1}) {op} {agg2}({col2})",
+      "multi_condition_join": "AND"
+    }
+  ],
+  "rules": [
+    {
+      "name": "both_negative_required_columns",
+      "description": "When question asks for both-ve / underperforming, always include revenue, target_revenue and prev_revenue so comparison is visible.",
+      "trigger": { "type": "having_pattern", "having_type": "metric_comparison", "polarity": "negative" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["revenue", "target_revenue", "prev_revenue"] }]
+    },
+    {
+      "name": "both_positive_required_columns",
+      "description": "When question asks for both+ve / overperforming, include revenue, target_revenue and prev_revenue for comparison.",
+      "trigger": { "type": "having_pattern", "having_type": "metric_comparison", "polarity": "positive" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["revenue", "target_revenue", "prev_revenue"] }]
+    },
+    {
+      "name": "highlight_adds_achievement_pct",
+      "description": "When user says highlight or refers to underperforming/overperforming, automatically add target achievement % so the gap is quantified.",
+      "trigger": { "type": "keyword", "phrases": ["highlight", "underperforming", "overperforming", "performing poorly", "best performing", "worst performing"] },
+      "actions": [{ "type": "ensure_formula", "formula": "target_achievement_pct" }]
+    },
+    {
+      "name": "mtd_comparison_requires_both_mtd_columns",
+      "description": "When MTD vs target or MTD vs last year is requested, ensure both mtd_revenue and the comparison metric are always in SELECT.",
+      "trigger": {
+        "type": "any_of",
+        "conditions": [
+          { "type": "keyword", "phrases": ["mtd vs target", "mtd vs last year", "mtd achievement", "mtd growth", "month to date vs"] },
+          { "type": "metric_present", "metrics": ["mtd_revenue", "prev_mtd_revenue"] }
+        ]
+      },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["mtd_revenue", "prev_mtd_revenue", "target_revenue"] }]
+    },
+    {
+      "name": "cumulative_comparison_adds_growth_pct",
+      "description": "When cumulative metrics (MTD/YTD/QTD) are used, automatically add the corresponding growth % formula for context.",
+      "trigger": { "type": "metric_category", "category": "cumulative" },
+      "actions": [{ "type": "ensure_formula", "formula": "mtd_growth_pct" }]
+    },
+    {
+      "name": "average_metric_adds_volume_context",
+      "description": "When an average metric (e.g. satisfaction, delivery days) is queried, also include orders_count so the average is contextualised by volume.",
+      "trigger": { "type": "metric_category", "category": "average" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["orders_count"] }]
+    },
+    {
+      "name": "gap_to_target_inline_formula",
+      "description": "When user asks about gap or shortfall to target, create an inline formula showing the absolute gap value.",
+      "trigger": { "type": "keyword", "phrases": ["gap to target", "shortfall", "how far from target", "distance from target", "remaining target", "how much left"] },
+      "actions": [
+        { "type": "create_formula", "name": "revenue_gap_to_target", "expression": "SUM({target_revenue}) - SUM({revenue})", "components": ["target_revenue", "revenue"], "label": "Gap to Target" },
+        { "type": "ensure_metrics", "metrics": ["revenue", "target_revenue"] }
+      ]
+    },
+    {
+      "name": "variance_vs_prev_inline_formula",
+      "description": "When user asks about variance or change vs previous period, create an inline formula for the absolute variance.",
+      "trigger": { "type": "keyword", "phrases": ["variance vs last year", "change vs last year", "delta vs last year", "change vs prev", "variance vs prior", "vs previous period"] },
+      "actions": [
+        { "type": "create_formula", "name": "revenue_variance", "expression": "SUM({revenue}) - SUM({prev_revenue})", "components": ["revenue", "prev_revenue"], "label": "Revenue Variance" },
+        { "type": "ensure_metrics", "metrics": ["revenue", "prev_revenue"] }
+      ]
+    },
+    {
+      "name": "mtd_gap_inline_formula",
+      "description": "When user asks specifically about MTD gap or MTD shortfall, create an MTD-specific gap formula using cumulative columns.",
+      "trigger": { "type": "keyword", "phrases": ["mtd gap", "mtd shortfall", "mtd remaining", "month remaining", "how much to target this month"] },
+      "actions": [
+        { "type": "create_formula", "name": "mtd_revenue_gap", "expression": "SUM({target_revenue}) - SUM({mtd_revenue})", "components": ["target_revenue", "mtd_revenue"], "label": "MTD Gap to Target" },
+        { "type": "ensure_metrics", "metrics": ["mtd_revenue", "target_revenue"] }
+      ]
+    },
+    {
+      "name": "achievement_pct_uses_ytd_in_ytd_context",
+      "description": "When question is about YTD context, override target_achievement_pct to use ytd_revenue and ytd_target.",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "formula_requested", "formula": "target_achievement_pct" },
+          { "type": "metric_present", "metrics": ["ytd_revenue", "ytd_target"] }
+        ]
+      },
+      "actions": [{ "type": "override_formula", "formula": "target_achievement_pct", "expression": "SUM({ytd_revenue}) / NULLIF(SUM({ytd_target}), 0) * 100", "components": ["ytd_revenue", "ytd_target"], "label": "YTD Achievement %" }]
+    },
+    {
+      "name": "run_rate_uses_qtd_in_quarterly_context",
+      "description": "When run rate is requested in a quarterly context, override revenue_run_rate to use qtd_revenue.",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "formula_requested", "formula": "revenue_run_rate" },
+          { "type": "metric_present", "metrics": ["qtd_revenue"] }
+        ]
+      },
+      "actions": [{ "type": "override_formula", "formula": "revenue_run_rate", "expression": "SUM({qtd_revenue}) / NULLIF({days_elapsed}, 0) * {total_days}", "components": ["qtd_revenue"], "label": "QTD Run Rate" }]
+    },
+    {
+      "name": "tabular_format_hint",
+      "description": "When user asks for tabular format, set output to programmatic enumeration table.",
+      "trigger": { "type": "keyword", "phrases": ["tabular format", "in a table", "table format", "show as table", "show in table", "tabular"] },
+      "actions": [{ "type": "set_output_hint", "format": "table", "always_programmatic_enumeration": true }]
+    },
+    {
+      "name": "comparison_table_for_two_periods",
+      "description": "When question compares two periods, render as a side-by-side comparison table.",
+      "trigger": { "type": "keyword", "phrases": ["compare", "comparison", "side by side", "vs last year in table", "this month vs last year"] },
+      "actions": [{ "type": "set_output_hint", "format": "comparison_table", "always_programmatic_enumeration": true }]
+    },
+    {
+      "name": "lowest_performing_sort_asc",
+      "description": "Surface worst performers first when question asks for lowest/worst.",
+      "trigger": { "type": "keyword", "phrases": ["lowest", "worst", "bottom", "least", "underperforming", "lagging"] },
+      "actions": [{ "type": "set_sort", "metric": "revenue", "direction": "ASC" }]
+    },
+    {
+      "name": "top_performing_sort_desc",
+      "description": "Surface best performers first when question asks for top/highest/best.",
+      "trigger": { "type": "keyword", "phrases": ["top", "highest", "best", "most", "leading", "overperforming"] },
+      "actions": [{ "type": "set_sort", "metric": "revenue", "direction": "DESC" }]
+    },
+    {
+      "name": "satisfaction_sort_asc_for_lowest",
+      "description": "When asking for lowest satisfaction, sort ascending by satisfaction score.",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "keyword", "phrases": ["lowest satisfaction", "worst satisfaction", "unhappy customers", "poor satisfaction", "lowest rating"] },
+          { "type": "metric_present", "metrics": ["customer_satisfaction"] }
+        ]
+      },
+      "actions": [{ "type": "set_sort", "metric": "customer_satisfaction", "direction": "ASC" }]
+    },
+    {
+      "name": "delivery_sort_desc_for_slowest",
+      "description": "When asking for slowest delivery, sort descending by delivery_days.",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "keyword", "phrases": ["slowest delivery", "longest delivery", "worst delivery", "highest delivery days", "most delayed"] },
+          { "type": "metric_present", "metrics": ["delivery_days"] }
+        ]
+      },
+      "actions": [{ "type": "set_sort", "metric": "delivery_days", "direction": "DESC" }]
+    }
+  ]
+}

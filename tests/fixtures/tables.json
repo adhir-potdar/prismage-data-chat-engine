@@ -1,0 +1,12 @@
+{
+  "tables": [
+    {
+      "name": "orders",
+      "channel": "transactional",
+      "date_column": "order_date",
+      "description": "Orders fact table",
+      "dimensions": ["region", "product_name", "sales_rep"],
+      "metrics": ["revenue", "cost", "orders_count", "customer_satisfaction", "mtd_revenue", "prev_mtd_revenue"]
+    }
+  ]
+}

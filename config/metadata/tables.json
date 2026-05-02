@@ -1,0 +1,44 @@
+{
+  "tables": [
+    {
+      "name": "orders",
+      "channel": "transactional",
+      "date_column": "order_date",
+      "description": "One row per order. Contains revenue, quantity, discounts, returns and customer/sales info.",
+      "dimensions": ["region", "country", "city", "customer_segment", "customer_name", "sales_rep", "sales_manager", "channel"],
+      "metrics": ["revenue", "quantity", "orders_count", "target_revenue", "prev_revenue", "returns_value", "discount", "customer_satisfaction", "delivery_days", "mtd_revenue", "prev_mtd_revenue", "ytd_revenue", "prev_ytd_revenue", "ytd_target", "qtd_revenue"]
+    },
+    {
+      "name": "order_items",
+      "channel": "transactional",
+      "date_column": "order_date",
+      "description": "One row per line item within an order. Contains product-level revenue, cost, quantity.",
+      "dimensions": ["region", "country", "product_category", "product_name", "sales_rep", "channel"],
+      "metrics": ["revenue", "quantity", "cost", "discount", "unit_price", "prev_revenue"]
+    },
+    {
+      "name": "invoices",
+      "channel": "transactional",
+      "date_column": "invoice_date",
+      "description": "Invoiced orders with settlement status. Revenue, target and run-rate metrics.",
+      "dimensions": ["region", "country", "customer_segment", "customer_name", "sales_rep", "sales_manager", "channel"],
+      "metrics": ["revenue", "orders_count", "target_revenue", "returns_value", "mtd_revenue", "prev_mtd_revenue", "ytd_revenue", "ytd_target"]
+    },
+    {
+      "name": "customers",
+      "channel": "reference",
+      "date_column": "created_date",
+      "description": "Customer master — segment, location, satisfaction scores.",
+      "dimensions": ["region", "country", "city", "customer_segment", "customer_name"],
+      "metrics": ["customer_satisfaction", "orders_count"]
+    },
+    {
+      "name": "products",
+      "channel": "reference",
+      "date_column": "launch_date",
+      "description": "Product master — category, name, price, cost.",
+      "dimensions": ["product_category", "product_name"],
+      "metrics": ["cost", "unit_price"]
+    }
+  ]
+}

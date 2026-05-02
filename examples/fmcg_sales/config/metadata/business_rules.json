@@ -1,0 +1,52 @@
+{
+  "domain_context": "This is FMCG sales data. Primary = distributor sells to market.\nSecondary = retailer off-take. TGT = monthly target. CYMTD = current MTD.\nLYMTD = last year same period. Both-ve means CYMTD < TGT AND CYMTD < LYMTD.\n",
+  "metric_hints": [
+    { "phrase": "target v/s achievement", "maps_to_having": { "metric1": "cymtd", "metric2": "tgt" } },
+    { "phrase": "LYMTD to CYMTD", "maps_to_having": { "metric1": "cymtd", "metric2": "lymtd" } },
+    { "phrase": "both - ve", "polarity": "negative", "operator": "<" },
+    { "phrase": "both + ve", "polarity": "positive", "operator": ">" }
+  ],
+  "having_patterns": [
+    {
+      "type": "vs_average",
+      "description": "Filter rows above or below average",
+      "sql_template": "HAVING {agg}({col}) {op} (SELECT AVG({col}) FROM {table})"
+    },
+    {
+      "type": "metric_comparison",
+      "description": "Filter rows where metric1 op metric2",
+      "sql_template": "HAVING {agg1}({col1}) {op} {agg2}({col2})",
+      "multi_condition_join": "AND"
+    }
+  ],
+  "rules": [
+    {
+      "name": "both_negative_required_columns",
+      "trigger": { "type": "having_pattern", "having_type": "metric_comparison", "polarity": "negative" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["cymtd", "lymtd", "tgt"] }]
+    },
+    {
+      "name": "both_positive_required_columns",
+      "trigger": { "type": "having_pattern", "having_type": "metric_comparison", "polarity": "positive" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["cymtd", "lymtd", "tgt"] }]
+    },
+    {
+      "name": "highlight_adds_achievement_pct",
+      "trigger": { "type": "keyword", "phrases": ["highlight", "underperforming", "overperforming"] },
+      "actions": [{ "type": "ensure_formula", "formula": "ach_pct_mtd" }]
+    },
+    {
+      "name": "primary_and_secondary_tabular",
+      "trigger": { "type": "keyword", "phrases": ["primary values and secondary values", "both Primary / Secondary"] },
+      "actions": [
+        { "type": "set_channel", "channels": ["primary", "secondary"] },
+        { "type": "set_output_hint", "format": "side_by_side_table", "primary_columns": ["cymtd", "lymtd", "tgt"], "secondary_columns": ["cymtd", "lymtd", "tgt"] }
+      ]
+    },
+    {
+      "name": "lowest_performing_sort",
+      "trigger": { "type": "keyword", "phrases": ["lowest performing", "worst performing", "bottom performing"] },
+      "actions": [{ "type": "set_sort", "metric": "cymtd", "direction": "ASC" }]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "dimensions": [
+    { "name": "region", "aliases": ["zone", "area"], "db_column": "region", "table_affinity": ["orders", "order_items"], "hierarchy_name": "geography", "hierarchy_level": 1 },
+    { "name": "product_name", "aliases": ["product", "item"], "db_column": "product_name", "table_affinity": ["orders", "order_items", "products"], "hierarchy_name": "product", "hierarchy_level": 2 },
+    { "name": "sales_rep", "aliases": ["rep", "salesperson"], "db_column": "sales_rep", "table_affinity": ["orders"], "hierarchy_name": "sales", "hierarchy_level": 2 }
+  ]
+}

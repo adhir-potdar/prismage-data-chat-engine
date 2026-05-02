@@ -1,0 +1,44 @@
+{
+  "tables": [
+    {
+      "name": "orders",
+      "channel": "transactional",
+      "date_column": "order_date",
+      "description": "Orders fact table — one row per order; includes sales hierarchy, customer, product, and MTD/YTD running totals",
+      "dimensions": ["region", "country", "city", "product_category", "product_name", "customer_segment", "customer_name", "sales_rep", "sales_manager", "channel"],
+      "metrics": ["revenue", "quantity", "cost", "orders_count", "target_revenue", "prev_revenue", "returns_value", "discount", "customer_satisfaction", "delivery_days", "mtd_revenue", "prev_mtd_revenue", "ytd_revenue", "prev_ytd_revenue", "ytd_target", "qtd_revenue"]
+    },
+    {
+      "name": "order_items",
+      "channel": "transactional",
+      "date_column": "order_date",
+      "description": "Order line items — one row per product per order; used for product-level breakdowns",
+      "dimensions": ["region", "country", "product_category", "product_name", "channel"],
+      "metrics": ["revenue", "quantity", "cost", "returns_value", "discount"]
+    },
+    {
+      "name": "invoices",
+      "channel": "finance",
+      "date_column": "invoice_date",
+      "description": "Invoiced orders — finance view; includes region, customer, and sales hierarchy",
+      "dimensions": ["region", "country", "customer_name", "sales_rep", "sales_manager"],
+      "metrics": ["revenue", "target_revenue", "prev_revenue"]
+    },
+    {
+      "name": "customers",
+      "channel": "reference",
+      "date_column": null,
+      "description": "Customer master — segments, geographies",
+      "dimensions": ["country", "city", "customer_segment", "customer_name"],
+      "metrics": ["orders_count", "revenue", "customer_satisfaction"]
+    },
+    {
+      "name": "products",
+      "channel": "reference",
+      "date_column": null,
+      "description": "Product master — categories, names, unit prices",
+      "dimensions": ["product_category", "product_name"],
+      "metrics": ["quantity", "unit_price"]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "tables": [
+    { "name": "sales_rep_primary", "channel": "primary", "date_column": "time_key", "description": "Primary sales by sales hierarchy, distributor, product, brand, category, town", "dimensions": ["zsm", "rsm", "asm", "so", "product", "brand", "category", "distributor", "town"], "metrics": ["fy25", "tgt", "cymtd", "lymtd", "lysm", "ty_ytd", "ly_ytd", "ytd_tgt"] },
+    { "name": "sales_rep_secondary", "channel": "secondary", "date_column": "time_key", "description": "Secondary sales by sales hierarchy, distributor, product, brand, category, town", "dimensions": ["zsm", "rsm", "asm", "so", "product", "brand", "category", "distributor", "town"], "metrics": ["fy25", "tgt", "cymtd", "lymtd", "lysm", "ty_ytd", "ly_ytd", "ytd_tgt"] },
+    { "name": "product_primary", "channel": "primary", "date_column": "time_key", "description": "Primary sales by product, brand, category and ZSM/RSM/ASM", "dimensions": ["zsm", "rsm", "asm", "product", "brand", "category"], "metrics": ["fy25", "tgt", "cymtd", "lymtd", "lysm", "ty_ytd", "ly_ytd", "ytd_tgt"] },
+    { "name": "product_secondary", "channel": "secondary", "date_column": "time_key", "description": "Secondary sales by product, brand, category and ZSM/RSM/ASM", "dimensions": ["zsm", "rsm", "asm", "product", "brand", "category"], "metrics": ["fy25", "tgt", "cymtd", "lymtd", "lysm", "ty_ytd", "ly_ytd", "ytd_tgt"] },
+    { "name": "dashboard", "channel": "dashboard", "date_column": "time_key", "description": "Aggregated view by entity, sales_head, business_head, ZSM/RSM", "dimensions": ["zsm", "rsm"], "metrics": ["fy25", "tgt", "cymtd", "lymtd", "lysm", "ty_ytd", "ly_ytd", "ytd_tgt"] }
+  ]
+}

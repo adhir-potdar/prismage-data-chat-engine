@@ -1,0 +1,26 @@
+{
+  "domain_context": "Test domain for unit testing. Revenue and MTD metrics available.\n",
+  "metric_hints": [
+    { "phrase": "above target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" }, "polarity": "positive", "operator": ">" }
+  ],
+  "having_patterns": [
+    { "type": "metric_comparison", "description": "Filter rows where metric1 op metric2", "sql_template": "HAVING {agg1}({col1}) {op} {agg2}({col2})", "multi_condition_join": "AND" }
+  ],
+  "rules": [
+    {
+      "name": "highlight_adds_margin",
+      "trigger": { "type": "keyword", "phrases": ["highlight", "underperforming"] },
+      "actions": [{ "type": "ensure_formula", "formula": "profit_margin_pct" }]
+    },
+    {
+      "name": "top_performing_sort_desc",
+      "trigger": { "type": "keyword", "phrases": ["top", "best", "highest"] },
+      "actions": [{ "type": "set_sort", "metric": "revenue", "direction": "DESC" }]
+    },
+    {
+      "name": "cumulative_comparison_adds_growth_pct",
+      "trigger": { "type": "metric_category", "category": "cumulative" },
+      "actions": [{ "type": "ensure_formula", "formula": "mtd_growth_pct" }]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+"""Prismage engine core package."""

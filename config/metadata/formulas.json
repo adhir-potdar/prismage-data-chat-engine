@@ -1,0 +1,132 @@
+{
+  "formulas": [
+    {
+      "name": "profit_margin_pct",
+      "display": "Profit Margin %",
+      "expression": "(SUM({revenue}) - SUM({cost})) / NULLIF(SUM({revenue}), 0) * 100",
+      "components": ["revenue", "cost"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "revenue_growth_pct",
+      "display": "Revenue Growth %",
+      "expression": "(SUM({revenue}) / NULLIF(SUM({prev_revenue}), 0) - 1) * 100",
+      "components": ["revenue", "prev_revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "target_achievement_pct",
+      "display": "Target Achievement %",
+      "expression": "SUM({revenue}) / NULLIF(SUM({target_revenue}), 0) * 100",
+      "components": ["revenue", "target_revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "mtd_achievement_pct",
+      "display": "MTD Achievement %",
+      "expression": "SUM({mtd_revenue}) / NULLIF(SUM({target_revenue}), 0) * 100",
+      "components": ["mtd_revenue", "target_revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "mtd_growth_pct",
+      "display": "MTD Growth %",
+      "expression": "(SUM({mtd_revenue}) / NULLIF(SUM({prev_mtd_revenue}), 0) - 1) * 100",
+      "components": ["mtd_revenue", "prev_mtd_revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "ytd_achievement_pct",
+      "display": "YTD Achievement %",
+      "expression": "SUM({ytd_revenue}) / NULLIF(SUM({ytd_target}), 0) * 100",
+      "components": ["ytd_revenue", "ytd_target"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "ytd_growth_pct",
+      "display": "YTD Growth %",
+      "expression": "(SUM({ytd_revenue}) / NULLIF(SUM({prev_ytd_revenue}), 0) - 1) * 100",
+      "components": ["ytd_revenue", "prev_ytd_revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "return_rate_pct",
+      "display": "Return Rate %",
+      "expression": "SUM({returns_value}) / NULLIF(SUM({revenue}), 0) * 100",
+      "components": ["returns_value", "revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "discount_rate_pct",
+      "display": "Discount Rate %",
+      "expression": "SUM({discount}) / NULLIF(SUM({revenue}) + SUM({discount}), 0) * 100",
+      "components": ["discount", "revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "revenue_saliency_pct",
+      "display": "Revenue Saliency %",
+      "expression": "SUM({revenue}) / NULLIF(SUM(SUM({revenue})) OVER (), 0) * 100",
+      "components": ["revenue"],
+      "runtime_vars": [],
+      "window": true
+    },
+    {
+      "name": "avg_order_value",
+      "display": "Avg Order Value",
+      "expression": "SUM({revenue}) / NULLIF(COUNT({orders_count}), 0)",
+      "components": ["revenue", "orders_count"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "revenue_gap_to_target",
+      "display": "Gap to Target",
+      "expression": "SUM({target_revenue}) - SUM({revenue})",
+      "components": ["target_revenue", "revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "revenue_run_rate",
+      "display": "Run Rate",
+      "expression": "SUM({mtd_revenue}) / NULLIF({days_elapsed}, 0) * {total_days}",
+      "components": ["mtd_revenue"],
+      "runtime_vars": ["days_elapsed", "total_days"],
+      "window": false
+    },
+    {
+      "name": "required_daily_revenue",
+      "display": "Required Daily Revenue",
+      "expression": "(SUM({target_revenue}) - SUM({mtd_revenue})) / NULLIF({days_remaining}, 0)",
+      "components": ["target_revenue", "mtd_revenue"],
+      "runtime_vars": ["days_remaining"],
+      "window": false
+    },
+    {
+      "name": "mtd_revenue_gap",
+      "display": "MTD Gap to Target",
+      "expression": "SUM({target_revenue}) - SUM({mtd_revenue})",
+      "components": ["target_revenue", "mtd_revenue"],
+      "runtime_vars": [],
+      "window": false
+    },
+    {
+      "name": "revenue_variance",
+      "display": "Revenue Variance vs Prev",
+      "expression": "SUM({revenue}) - SUM({prev_revenue})",
+      "components": ["revenue", "prev_revenue"],
+      "runtime_vars": [],
+      "window": false
+    }
+  ]
+}

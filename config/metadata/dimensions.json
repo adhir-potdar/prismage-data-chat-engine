@@ -1,0 +1,84 @@
+{
+  "dimensions": [
+    {
+      "name": "region",
+      "aliases": ["region", "sales region", "territory", "area"],
+      "db_column": "region",
+      "table_affinity": ["orders", "order_items", "customers"],
+      "hierarchy_name": "geography",
+      "hierarchy_level": 1
+    },
+    {
+      "name": "country",
+      "aliases": ["country", "nation"],
+      "db_column": "country",
+      "table_affinity": ["orders", "order_items", "customers"],
+      "hierarchy_name": "geography",
+      "hierarchy_level": 2
+    },
+    {
+      "name": "city",
+      "aliases": ["city", "town", "location"],
+      "db_column": "city",
+      "table_affinity": ["orders", "customers"],
+      "hierarchy_name": "geography",
+      "hierarchy_level": 3
+    },
+    {
+      "name": "product_category",
+      "aliases": ["product category", "category", "product type", "segment"],
+      "db_column": "product_category",
+      "table_affinity": ["order_items", "products"],
+      "hierarchy_name": "product",
+      "hierarchy_level": 1
+    },
+    {
+      "name": "product_name",
+      "aliases": ["product", "product name", "item", "sku", "article"],
+      "db_column": "product_name",
+      "table_affinity": ["order_items", "products"],
+      "hierarchy_name": "product",
+      "hierarchy_level": 2
+    },
+    {
+      "name": "customer_segment",
+      "aliases": ["customer segment", "customer type", "segment", "tier", "customer tier"],
+      "db_column": "customer_segment",
+      "table_affinity": ["orders", "customers"],
+      "hierarchy_name": "customer",
+      "hierarchy_level": 1
+    },
+    {
+      "name": "customer_name",
+      "aliases": ["customer", "customer name", "account", "client"],
+      "db_column": "customer_name",
+      "table_affinity": ["orders", "customers"],
+      "hierarchy_name": "customer",
+      "hierarchy_level": 2
+    },
+    {
+      "name": "sales_rep",
+      "aliases": ["sales rep", "sales person", "sales executive", "account manager", "rep"],
+      "db_column": "sales_rep",
+      "table_affinity": ["orders", "invoices"],
+      "hierarchy_name": "sales",
+      "hierarchy_level": 2
+    },
+    {
+      "name": "sales_manager",
+      "aliases": ["sales manager", "manager", "team lead", "regional manager"],
+      "db_column": "sales_manager",
+      "table_affinity": ["orders", "invoices"],
+      "hierarchy_name": "sales",
+      "hierarchy_level": 1
+    },
+    {
+      "name": "channel",
+      "aliases": ["sales channel", "channel", "medium", "platform"],
+      "db_column": "channel",
+      "table_affinity": ["orders", "invoices"],
+      "hierarchy_name": null,
+      "hierarchy_level": null
+    }
+  ]
+}

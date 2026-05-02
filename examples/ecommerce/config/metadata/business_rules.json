@@ -1,0 +1,123 @@
+{
+  "domain_context": "This is an e-commerce sales dataset. Revenue = net sales. Target = planned revenue.\nMTD = month-to-date cumulative. YTD = year-to-date cumulative. QTD = quarter-to-date.\nPrev = same period last year. Growth % = (current / previous - 1) * 100.\nBoth-ve means current < target AND current < previous period.\nBoth+ve means current > target AND current > previous period.\n",
+  "metric_hints": [
+    { "phrase": "vs target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" } },
+    { "phrase": "above target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" }, "polarity": "positive", "operator": ">" },
+    { "phrase": "below target", "maps_to_having": { "metric1": "revenue", "metric2": "target_revenue" }, "polarity": "negative", "operator": "<" },
+    { "phrase": "both negative", "polarity": "negative", "operator": "<" },
+    { "phrase": "both positive", "polarity": "positive", "operator": ">" },
+    { "phrase": "under performing", "polarity": "negative", "operator": "<" },
+    { "phrase": "over performing", "polarity": "positive", "operator": ">" }
+  ],
+  "having_patterns": [
+    { "type": "vs_average", "description": "Filter rows above or below the group average", "sql_template": "HAVING {agg}({col}) {op} (SELECT AVG({col}) FROM {table})" },
+    { "type": "gap_to_target", "description": "Filter rows where revenue gap to target meets a threshold", "sql_template": "HAVING (SUM({target_col}) - SUM({revenue_col})) {op} {threshold}" },
+    { "type": "metric_comparison", "description": "Filter rows where metric1 op metric2 (multi-condition supported)", "sql_template": "HAVING {agg1}({col1}) {op} {agg2}({col2})", "multi_condition_join": "AND" }
+  ],
+  "rules": [
+    {
+      "name": "both_negative_required_columns",
+      "trigger": { "type": "having_pattern", "having_type": "metric_comparison", "polarity": "negative" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["revenue", "prev_revenue", "target_revenue"] }]
+    },
+    {
+      "name": "both_positive_required_columns",
+      "trigger": { "type": "having_pattern", "having_type": "metric_comparison", "polarity": "positive" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["revenue", "prev_revenue", "target_revenue"] }]
+    },
+    {
+      "name": "highlight_adds_achievement_pct",
+      "trigger": { "type": "keyword", "phrases": ["highlight", "underperforming", "overperforming"] },
+      "actions": [{ "type": "ensure_formula", "formula": "target_achievement_pct" }]
+    },
+    {
+      "name": "gap_to_target_inline_formula",
+      "trigger": { "type": "keyword", "phrases": ["gap to target", "shortfall", "how much short", "revenue gap"] },
+      "actions": [{ "type": "ensure_formula", "formula": "revenue_gap_to_target" }]
+    },
+    {
+      "name": "variance_vs_prev_inline_formula",
+      "trigger": { "type": "keyword", "phrases": ["variance", "change vs last year", "delta", "difference from last year"] },
+      "actions": [{ "type": "ensure_formula", "formula": "revenue_variance" }]
+    },
+    {
+      "name": "mtd_gap_inline_formula",
+      "trigger": { "type": "keyword", "phrases": ["mtd gap", "MTD shortfall", "remaining MTD target"] },
+      "actions": [{ "type": "ensure_formula", "formula": "mtd_revenue_gap" }]
+    },
+    {
+      "name": "cumulative_comparison_adds_growth_pct",
+      "trigger": { "type": "metric_category", "category": "cumulative" },
+      "actions": [{ "type": "ensure_formula", "formula": "mtd_growth_pct" }]
+    },
+    {
+      "name": "average_metric_adds_volume_context",
+      "trigger": { "type": "metric_category", "category": "average" },
+      "actions": [{ "type": "ensure_metrics", "metrics": ["orders_count"] }]
+    },
+    {
+      "name": "achievement_pct_uses_ytd_in_ytd_context",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "keyword", "phrases": ["ytd achievement", "year to date achievement", "YTD vs target"] },
+          { "type": "metric_present", "metrics": ["ytd_revenue", "ytd_target"] }
+        ]
+      },
+      "actions": [{ "type": "override_formula", "formula": "target_achievement_pct", "expression": "SUM({ytd_revenue}) / NULLIF(SUM({ytd_target}), 0) * 100", "components": ["ytd_revenue", "ytd_target"], "label": "YTD Achievement %" }]
+    },
+    {
+      "name": "run_rate_uses_qtd_in_quarterly_context",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "keyword", "phrases": ["quarterly run rate", "QTD run rate", "quarter run rate"] },
+          { "type": "metric_present", "metrics": ["qtd_revenue"] }
+        ]
+      },
+      "actions": [{ "type": "override_formula", "formula": "revenue_run_rate", "expression": "SUM({qtd_revenue}) / NULLIF({days_elapsed}, 0) * {total_days}", "components": ["qtd_revenue"], "label": "Quarterly Run Rate" }]
+    },
+    {
+      "name": "tabular_format_hint",
+      "trigger": { "type": "keyword", "phrases": ["tabular format", "in a table", "show as table", "table format"] },
+      "actions": [{ "type": "set_output_hint", "format": "table", "always_programmatic_enumeration": true }]
+    },
+    {
+      "name": "comparison_table_for_two_periods",
+      "trigger": { "type": "keyword", "phrases": ["compare mtd", "mtd vs ytd", "period comparison", "side by side"] },
+      "actions": [{ "type": "set_output_hint", "format": "comparison_table", "always_programmatic_enumeration": true }]
+    },
+    {
+      "name": "lowest_performing_sort_asc",
+      "trigger": { "type": "keyword", "phrases": ["lowest", "worst", "bottom", "least", "lowest performing", "worst performing"] },
+      "actions": [{ "type": "set_sort", "metric": "revenue", "direction": "ASC" }]
+    },
+    {
+      "name": "top_performing_sort_desc",
+      "trigger": { "type": "keyword", "phrases": ["top", "best", "highest", "top performing", "best performing"] },
+      "actions": [{ "type": "set_sort", "metric": "revenue", "direction": "DESC" }]
+    },
+    {
+      "name": "satisfaction_sort_asc_for_lowest",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "keyword", "phrases": ["lowest satisfaction", "worst rated", "lowest csat", "worst csat"] },
+          { "type": "metric_present", "metrics": ["customer_satisfaction"] }
+        ]
+      },
+      "actions": [{ "type": "set_sort", "metric": "customer_satisfaction", "direction": "ASC" }]
+    },
+    {
+      "name": "delivery_sort_desc_for_slowest",
+      "trigger": {
+        "type": "compound",
+        "conditions": [
+          { "type": "keyword", "phrases": ["slowest delivery", "longest delivery", "most delayed", "worst delivery"] },
+          { "type": "metric_present", "metrics": ["delivery_days"] }
+        ]
+      },
+      "actions": [{ "type": "set_sort", "metric": "delivery_days", "direction": "DESC" }]
+    }
+  ]
+}

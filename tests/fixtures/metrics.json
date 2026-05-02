@@ -1,0 +1,12 @@
+{
+  "metrics": [
+    { "name": "revenue", "aliases": ["sales", "income"], "db_column": "revenue", "aggregate_fn": "SUM", "category": "absolute", "table_affinity": ["orders", "order_items"] },
+    { "name": "cost", "aliases": ["COGS"], "db_column": "cost", "aggregate_fn": "SUM", "category": "absolute", "table_affinity": ["orders"] },
+    { "name": "orders_count", "aliases": ["number of orders"], "db_column": "order_id", "aggregate_fn": "COUNT", "category": "absolute", "table_affinity": ["orders"] },
+    { "name": "customer_satisfaction", "aliases": ["satisfaction", "csat"], "db_column": "satisfaction_score", "aggregate_fn": "AVG", "category": "average", "table_affinity": ["orders"] },
+    { "name": "mtd_revenue", "aliases": ["MTD", "month to date revenue"], "db_column": "mtd_revenue", "aggregate_fn": "SUM", "category": "cumulative", "table_affinity": ["orders"] },
+    { "name": "prev_mtd_revenue", "aliases": ["last year MTD", "LYMTD"], "db_column": "prev_mtd_revenue", "aggregate_fn": "SUM", "category": "cumulative", "table_affinity": ["orders"] },
+    { "name": "profit_margin_pct", "aliases": ["profit margin", "margin %"], "db_column": null, "aggregate_fn": null, "category": "percentage", "formula_ref": "profit_margin_pct", "table_affinity": ["orders", "order_items"] },
+    { "name": "avg_order_value", "aliases": ["AOV", "average order value"], "db_column": null, "aggregate_fn": null, "category": "formula", "formula_ref": "avg_order_value", "table_affinity": ["orders"] }
+  ]
+}

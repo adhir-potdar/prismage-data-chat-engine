@@ -1,0 +1,7 @@
+{
+  "formulas": [
+    { "name": "profit_margin_pct", "display": "Profit Margin %", "expression": "SUM({cost}) / NULLIF(SUM({revenue}), 0) * 100", "components": ["cost", "revenue"], "runtime_vars": [], "window": false },
+    { "name": "avg_order_value", "display": "Average Order Value", "expression": "SUM({revenue}) / NULLIF(COUNT({orders_count}), 0)", "components": ["revenue", "orders_count"], "runtime_vars": [], "window": false },
+    { "name": "mtd_growth_pct", "display": "MTD Growth %", "expression": "(SUM({mtd_revenue}) - SUM({prev_mtd_revenue})) / NULLIF(SUM({prev_mtd_revenue}), 0) * 100", "components": ["mtd_revenue", "prev_mtd_revenue"], "runtime_vars": [], "window": false }
+  ]
+}

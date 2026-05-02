@@ -11,12 +11,13 @@
 7. [Formula Engine](#formula-engine)
 8. [HAVING Engine](#having-engine)
 9. [Table Router](#table-router)
-10. [LangChain Integration](#langchain-integration)
-11. [LangSmith Integration](#langsmith-integration)
-12. [Metadata Registry](#metadata-registry)
-13. [Prompt System](#prompt-system)
-14. [Programmatic Enumeration](#programmatic-enumeration)
-15. [Onboarding a New Domain](#onboarding-a-new-domain)
+10. [Embedding Router](#embedding-router)
+11. [LangChain Integration](#langchain-integration)
+12. [LangSmith Integration](#langsmith-integration)
+13. [Metadata Registry](#metadata-registry)
+14. [Prompt System](#prompt-system)
+15. [Programmatic Enumeration](#programmatic-enumeration)
+16. [Onboarding a New Domain](#onboarding-a-new-domain)
 
 ---
 
@@ -88,22 +89,26 @@ in JSON configuration files.
 ║  ┌──────────────▼──────────────┐     ┌────────────────────────────────────┐ ║
 ║  │     RULES SUBSYSTEM         │     │       QUERY SUBSYSTEM              │ ║
 ║  │                             │     │                                    │ ║
-║  │  BusinessRulesEngine        │     │  TableRouter                       │ ║
-║  │   trigger evaluators:       │     │   affinity set intersection        │ ║
-║  │    keyword                  │     │   channel filter                   │ ║
-║  │    having_pattern           │     │                                    │ ║
-║  │    formula_requested        │     │  FormulaEngine                     │ ║
-║  │    metric_present           │     │   component → db_column resolve    │ ║
-║  │    metric_category          │     │   runtime_var injection            │ ║
-║  │    compound / any_of        │     │                                    │ ║
-║  │   action handlers:          │     │  HavingEngine                      │ ║
-║  │    ensure_metrics/dims      │     │   vs_average                       │ ║
-║  │    ensure/create/override   │     │   gap_to_target                    │ ║
-║  │    formula                  │     │   metric_comparison                │ ║
+║  │  BusinessRulesEngine        │     │  EmbeddingTableRouter  (default)   │ ║
+║  │   trigger evaluators:       │     │   MetadataEmbeddingStore           │ ║
+║  │    keyword                  │     │   cosine similarity search         │ ║
+║  │    having_pattern           │     │   on-disk embedding cache          │ ║
+║  │    formula_requested        │     │                 OR                 │ ║
+║  │    metric_present           │     │  TableRouter  (affinity mode)      │ ║
+║  │    metric_category          │     │   table_affinity set intersection  │ ║
+║  │    compound / any_of        │     │   channel filter                   │ ║
+║  │   action handlers:          │     │                                    │ ║
+║  │    ensure_metrics/dims      │     │  FormulaEngine                     │ ║
+║  │    ensure/create/override   │     │   component → db_column resolve    │ ║
+║  │    formula                  │     │   runtime_var injection            │ ║
 ║  │    set_output_hint          │     │                                    │ ║
-║  │    set_channel              │     │  QueryBuilder                      │ ║
-║  │    set_sort                 │     │   SELECT / FROM / WHERE            │ ║
-║  └─────────────────────────────┘     │   GROUP BY / HAVING / ORDER BY     │ ║
+║  │    set_channel              │     │  HavingEngine                      │ ║
+║  │    set_sort                 │     │   vs_average / gap_to_target       │ ║
+║  └─────────────────────────────┘     │   metric_comparison                │ ║
+║                                      │                                    │ ║
+║                                      │  QueryBuilder                      │ ║
+║                                      │   SELECT / FROM / WHERE            │ ║
+║                                      │   GROUP BY / HAVING / ORDER BY     │ ║
 ║                                      │   LIMIT (deterministic SQL)        │ ║
 ║                                      └────────────────────────────────────┘ ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -112,9 +117,9 @@ in JSON configuration files.
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                        INFRASTRUCTURE LAYER                                  ║
 ║                                                                              ║
-║  adapters/database.py          adapters/llm.py                               ║
-║  SQLDatabase (LangChain)       ChatOpenAI / ChatAnthropic                    ║
-║  via SQLAlchemy URI            (BaseChatModel interface)                     ║
+║  adapters/database.py          adapters/llm.py          adapters/embeddings.py║
+║  SQLDatabase (LangChain)       ChatOpenAI /             OpenAIEmbeddings /   ║
+║  via SQLAlchemy URI            ChatAnthropic            VoyageAIEmbeddings   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
          │
          ▼
@@ -170,7 +175,11 @@ in JSON configuration files.
  │  ┌───────────────────────────────────────────────┐                     │   │
  │  │  STAGE 2 — QueryBuilderStage  [Pure Python]   │                     │   │
  │  │                                               │                     │   │
- │  │  TableRouter                                  │                     │   │
+ │  │  EmbeddingTableRouter (default)               │                     │   │
+ │  │    embed intent terms → cosine similarity     │                     │   │
+ │  │    top-K tables ranked by score               │                     │   │
+ │  │         OR                                    │                     │   │
+ │  │  TableRouter (affinity mode)                  │                     │   │
  │  │    intersect table_affinity sets              │                     │   │
  │  │    filter by intent.channels                  │                     │   │
  │  │    → list[TableGroup]                         │                     │   │
@@ -534,7 +543,12 @@ Multi-condition patterns are joined with `AND` or `OR` as configured in
 
 ## Table Router
 
-`TableRouter` (`engine/query/router.py`) resolves which tables to query for a given intent.
+Two routing modes are available. The active router is selected via `router_mode` in
+`build_engine()` or the `PRISMAGE_ROUTER_MODE` environment variable.
+
+### Affinity Router — `router_mode="affinity"` (`engine/query/router.py`)
+
+Resolves tables by set intersection of `table_affinity` lists declared in JSON config.
 
 **Algorithm:**
 1. Collect `table_affinity` sets for all requested dimensions and metrics.
@@ -542,8 +556,47 @@ Multi-condition patterns are joined with `AND` or `OR` as configured in
 3. Filter by `intent.channels` if set by a business rule.
 4. Return a `TableGroup` list (table name + channel).
 
-If no intersection exists (e.g. a dimension and metric are never in the same table),
-the router falls back to union-of-best-match to return the most suitable table.
+Best for: fully enumerated configs, offline/no-API environments, strict determinism.
+
+---
+
+## Embedding Router
+
+### Semantic Router — `router_mode="embedding"` (default) (`engine/query/embedding_router.py`)
+
+Resolves tables by cosine similarity between the intent terms and embedded table metadata
+documents. More robust for questions with unfamiliar phrasing or incomplete `table_affinity`
+lists.
+
+**Components:**
+
+`MetadataEmbeddingStore` (`engine/metadata/embedding_store.py`):
+- Builds one text document per table at startup:
+  ```
+  Table: orders | Channel: ecommerce | Description: Orders fact table |
+  Dimensions: region(zone, area), product_name(item, sku) |
+  Metrics: revenue(sales, income), orders_count(order volume)
+  ```
+- Embeds all documents using the configured embeddings model
+  (default: OpenAI `text-embedding-3-small`).
+- Caches vectors to disk as JSON (default: `.cache/metadata_embeddings.json`).
+  The cache is keyed by an MD5 hash of all document content — rebuilt automatically
+  when any dimension, metric, or table config changes.
+
+`EmbeddingTableRouter`:
+- Constructs a query string from `intent.dimensions + intent.metrics + intent.formula_metrics`.
+- Calls `store.find_tables(query, top_k)` and ranks by cosine similarity.
+- Applies `intent.channels` filter after ranking.
+- Returns the top-K tables as `TableGroup` objects.
+
+**Choosing a mode:**
+
+| | `embedding` (default) | `affinity` |
+|---|---|---|
+| Table selection | Semantic similarity | Exact set intersection |
+| Requires API on startup | Yes (first run only, then cached) | No |
+| Handles incomplete affinity lists | Yes | No |
+| Deterministic | No (model-dependent) | Yes |
 
 ---
 

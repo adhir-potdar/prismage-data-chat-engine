@@ -18,6 +18,10 @@ User: "Which regions are both below target and below last year MTD?"
 - **Business Rules Engine** — trigger-action rules fire between parsing and query building.
   Rules can add metrics, inject formulas, create inline formulas, override existing formulas,
   set output hints, filter channels, and control sort order.
+- **Dual table routing modes** — `affinity` mode resolves tables by set-intersection of
+  `table_affinity` lists (deterministic, no API calls); `embedding` mode (default) uses
+  OpenAI `text-embedding-3-small` to rank tables by semantic similarity to the question,
+  with on-disk caching so embeddings are built only once.
 - **Deterministic SQL** — the metadata-driven query builder produces predictable, formula-aware
   SQL without relying on an LLM for query construction.
 - **LangChain integration** — uses LangChain for LLM calls (Stage 1 parsing, Stage 4 response)
@@ -33,11 +37,9 @@ User: "Which regions are both below target and below last year MTD?"
 ```bash
 pip install -e .
 
-# Set environment variables
-export OPENAI_API_KEY=sk-...
-export LANGCHAIN_API_KEY=ls__...       # optional — for LangSmith tracing
-export LANGCHAIN_TRACING_V2=true       # optional
-export DATABASE_URL=sqlite:///data.db  # any SQLAlchemy URI
+# Copy and fill in environment variables
+cp .env.example .env
+# Edit .env — set DATABASE_URL, OPENAI_API_KEY at minimum
 
 # Run the e-commerce demo
 python examples/ecommerce/demo.py
@@ -68,14 +70,16 @@ prismage-data-chat-engine/
 │   └── query.py                   # BuiltQuery, QueryResult, ChatResponse
 │
 ├── engine/
+│   ├── rules/
+│   │   └── engine.py              # BusinessRulesEngine — trigger evaluation + actions
 │   ├── metadata/
 │   │   ├── loader.py              # MetadataLoader — reads all 5 JSON files
 │   │   ├── registry.py            # MetadataRegistry — O(1) alias lookups, render helpers
-│   │   └── validator.py           # MetadataValidator — startup cross-reference checks
-│   ├── rules/
-│   │   └── engine.py              # BusinessRulesEngine — trigger evaluation + actions
+│   │   ├── validator.py           # MetadataValidator — startup cross-reference checks
+│   │   └── embedding_store.py     # MetadataEmbeddingStore — embeds table docs, find_tables()
 │   ├── query/
-│   │   ├── router.py              # TableRouter — resolves tables by dimension/metric affinity
+│   │   ├── router.py              # TableRouter — affinity set-intersection routing (default off)
+│   │   ├── embedding_router.py    # EmbeddingTableRouter — semantic similarity routing (default)
 │   │   ├── formula_engine.py      # FormulaEngine — expands SQL templates + runtime vars
 │   │   ├── having_engine.py       # HavingEngine — builds HAVING clauses from patterns
 │   │   └── builder.py             # QueryBuilder — assembles full SQL per table
@@ -92,7 +96,8 @@ prismage-data-chat-engine/
 │
 ├── adapters/
 │   ├── database.py                # create_database() → SQLDatabase wrapper
-│   └── llm.py                     # create_llm() factory (OpenAI / Anthropic)
+│   ├── llm.py                     # create_llm() factory (OpenAI / Anthropic)
+│   └── embeddings.py              # create_embeddings() factory (OpenAI / Voyage)
 │
 ├── api/
 │   └── chatbot.py                 # build_engine() public API + interactive CLI
@@ -112,6 +117,7 @@ prismage-data-chat-engine/
 │   ├── test_query_builder.py
 │   └── test_pipeline.py
 │
+├── .env.example                   # All PRISMAGE_* environment variables documented
 ├── DESIGN.md                      # Detailed architecture and design document
 ├── pyproject.toml
 └── requirements.txt
@@ -129,10 +135,17 @@ prismage-data-chat-engine/
 3. Point `build_engine()` at your config directory:
    ```python
    from api.chatbot import build_engine
+
+   # Default: semantic embedding routing (requires OPENAI_API_KEY)
    engine = build_engine(config_dir="my_domain/config/metadata")
+
+   # Optional: switch to deterministic affinity routing (no embeddings needed)
+   engine = build_engine(config_dir="my_domain/config/metadata", router_mode="affinity")
+
    response = engine.answer("Show top 5 products by revenue this month")
    print(response.answer)
    ```
+4. All engine parameters can also be set via `.env` — copy `.env.example` and fill in your values.
 
 ## Running Tests
 

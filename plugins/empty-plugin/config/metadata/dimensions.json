@@ -1,0 +1,13 @@
+{
+  "dimensions": [
+    {
+      "name": "example_dim",
+      "aliases": ["example", "sample dim"],
+      "db_column": "example_col",
+      "table_affinity": ["your_table_name"],
+      "filter_mode": null,
+      "hierarchy_name": null,
+      "hierarchy_level": null
+    }
+  ]
+}

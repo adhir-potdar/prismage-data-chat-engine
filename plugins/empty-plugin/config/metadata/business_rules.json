@@ -1,0 +1,6 @@
+{
+  "domain_context": "Describe the business domain in 1-2 sentences. The parser LLM uses this to understand the context of user questions.",
+  "metric_hints": [],
+  "having_patterns": [],
+  "rules": []
+}

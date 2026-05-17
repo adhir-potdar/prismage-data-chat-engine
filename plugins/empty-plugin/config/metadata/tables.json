@@ -1,0 +1,12 @@
+{
+  "tables": [
+    {
+      "name": "your_table_name",
+      "channel": "primary",
+      "date_column": "time_key",
+      "date_mode": "snapshot",
+      "dimensions": ["example_dim"],
+      "metrics": ["example_metric"]
+    }
+  ]
+}

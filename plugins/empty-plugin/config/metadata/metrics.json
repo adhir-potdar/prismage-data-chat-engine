@@ -1,0 +1,13 @@
+{
+  "metrics": [
+    {
+      "name": "example_metric",
+      "aliases": ["example metric", "sample value"],
+      "db_column": "example_metric_col",
+      "aggregate_fn": "SUM",
+      "category": "absolute",
+      "formula_ref": null,
+      "table_affinity": ["your_table_name"]
+    }
+  ]
+}

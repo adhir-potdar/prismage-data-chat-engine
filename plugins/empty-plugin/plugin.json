@@ -1,0 +1,11 @@
+{
+  "name": "your-plugin-name",
+  "version": "1.0",
+  "description": "One-line description of what this plugin does",
+  "config_dir": "config/metadata",
+  "prompts_dir": "config/prompts",
+  "docs_dir": "docs",
+  "tests_dir": "tests",
+  "docs": {},
+  "tests": {}
+}

@@ -36,7 +36,10 @@ class ExecutionResult(BaseModel):
 class ChatResponse(BaseModel):
     """Final response object returned by the engine to the caller."""
     question: str
-    answer: str
+    answer: str                        # full response (summary + analysis combined)
+    summary: Optional[str] = None      # one-line QUICK SUMMARY extracted from answer
+    detail: Optional[str] = None       # ANALYSIS section extracted from answer
+    tabular: Optional[str] = None      # programmatic row enumeration (for display)
     success: bool = True
     error: Optional[str] = None
     sql_queries: list[dict] = Field(default_factory=list)

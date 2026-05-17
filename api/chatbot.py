@@ -131,6 +131,112 @@ def build_engine(
     return ChatbotChain(parser, builder_stage, executor, responder, fallback)
 
 
+def build_plugin_engine(
+    plugin: str,
+    plugins_root: str | None = None,
+    connection_string: str | None = None,
+    llm_provider: str | None = None,
+    llm_model: str | None = None,
+    **kwargs,
+) -> ChatbotChain:
+    """
+    Build a ChatbotChain for a named plugin.
+
+    Discovers the plugin directory under plugins_root/<plugin>/ and loads
+    its plugin.json manifest to resolve config/prompts paths, then delegates
+    to build_engine().
+
+    Args:
+        plugin:             plugin name (e.g. "haldiram-sales")
+        plugins_root:       path to the plugins directory (PRISMAGE_PLUGINS_ROOT,
+                            default "plugins")
+        connection_string:  SQLAlchemy DB URL
+        llm_provider:       "openai" or "anthropic"
+        llm_model:          model name override
+        **kwargs:           forwarded to build_engine()
+
+    Returns:
+        ChatbotChain for the requested plugin.
+    """
+    import os
+    from pathlib import Path
+    from engine.plugins.loader import PluginLoader
+
+    root = plugins_root or os.getenv("PRISMAGE_PLUGINS_ROOT", "plugins")
+    plugin_dir = str(Path(root) / plugin)
+
+    return PluginLoader().load(
+        plugin_dir=plugin_dir,
+        connection_string=connection_string,
+        llm_provider=llm_provider,
+        llm_model=llm_model,
+        **kwargs,
+    )
+
+
+def build_multi_engine(
+    plugins_root: str | None = None,
+    connection_string: str | None = None,
+    llm_provider: str | None = None,
+    llm_model: str | None = None,
+    **kwargs,
+):
+    """
+    Discover and load all plugins under plugins_root/ into a PluginRegistry.
+
+    Each subdirectory that contains a plugin.json is treated as a plugin.
+    Returns a PluginRegistry whose .answer(plugin, question) method dispatches
+    to the correct plugin engine.
+
+    Args:
+        plugins_root:       path to the plugins directory (PRISMAGE_PLUGINS_ROOT,
+                            default "plugins")
+        connection_string:  SQLAlchemy DB URL (shared across all plugins)
+        llm_provider:       "openai" or "anthropic"
+        llm_model:          model name override
+        **kwargs:           forwarded to build_engine() for every plugin
+
+    Returns:
+        PluginRegistry with all discovered plugins loaded.
+    """
+    import os
+    from pathlib import Path
+    from engine.plugins.loader import PluginLoader
+    from engine.plugins.registry import PluginRegistry
+
+    root = plugins_root or os.getenv("PRISMAGE_PLUGINS_ROOT", "plugins")
+    root_path = Path(root)
+
+    if not root_path.exists():
+        raise FileNotFoundError(f"Plugins root directory not found: {root_path.resolve()}")
+
+    registry = PluginRegistry()
+    loader = PluginLoader()
+
+    for entry in sorted(root_path.iterdir()):
+        if entry.is_dir() and (entry / "plugin.json").exists():
+            try:
+                chain = loader.load(
+                    plugin_dir=str(entry),
+                    connection_string=connection_string,
+                    llm_provider=llm_provider,
+                    llm_model=llm_model,
+                    **kwargs,
+                )
+                # Use the name from plugin.json as the registry key
+                import json
+                manifest = json.loads((entry / "plugin.json").read_text())
+                name = manifest.get("name", entry.name)
+                registry.register(name, chain)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"Failed to load plugin from {entry}: {e}"
+                )
+
+    return registry
+
+
 def main():
     """Interactive CLI mode."""
     engine = build_engine()

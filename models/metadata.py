@@ -28,6 +28,7 @@ class Dimension(BaseModel):
     table_affinity: list[str] = Field(default_factory=list)
     hierarchy_name: Optional[str] = None
     hierarchy_level: Optional[int] = None
+    filter_mode: Optional[str] = None   # None/"exact" → = 'value'; "ilike" → ILIKE '%value%'
 
 
 class Metric(BaseModel):
@@ -57,6 +58,7 @@ class Table(BaseModel):
     description: Optional[str] = None
     dimensions: list[str] = Field(default_factory=list)
     metrics: list[str] = Field(default_factory=list)
+    date_mode: Optional[str] = None   # None/"range" → BETWEEN filter; "snapshot" → WHERE col = (SELECT MAX(col) FROM table)
 
 
 class MetricHint(BaseModel):

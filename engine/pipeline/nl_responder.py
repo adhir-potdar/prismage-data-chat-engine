@@ -30,13 +30,30 @@ class NLResponder:
         self.prompt_builder = prompt_builder
         self.output_parser = StrOutputParser()
 
-    def respond(self, execution_result: ExecutionResult, intent: ParsedIntent, question: str) -> str:
+    def respond(
+        self,
+        execution_result: ExecutionResult,
+        intent: ParsedIntent,
+        question: str,
+    ) -> tuple[str, str | None, str | None]:
+        """
+        Returns (full_answer, summary, detail).
+
+        full_answer — complete LLM response text
+        summary     — text after "QUICK SUMMARY:" up to the next section
+        detail      — text after "ANALYSIS:"
+        """
         if not execution_result.programmatic_enumeration or \
                 execution_result.programmatic_enumeration == "No data returned.":
-            return "No data was found for your query. Please refine your question or check the filters."
+            msg = "No data was found for your query. Please refine your question or check the filters."
+            return msg, None, None
 
+        # Apply display row limit from intent before passing to LLM
+        display_limit = intent.limit or 20
+        data_context = self._apply_row_limit(
+            execution_result.programmatic_enumeration, display_limit
+        )
         total_rows = execution_result.total_rows
-        data_context = execution_result.programmatic_enumeration
 
         task_description = self._build_task_description(total_rows, intent)
         context_line = self._build_context_line(question, intent)
@@ -49,10 +66,70 @@ class NLResponder:
 
         try:
             chain = prompt | self.llm | self.output_parser
-            return chain.invoke({})
+            full_answer: str = chain.invoke({})
         except Exception as e:
             logger.error(f"Stage 4 LLM error: {e}")
-            return data_context   # graceful fallback: return enumeration directly
+            full_answer = data_context  # graceful fallback
+
+        summary, detail = self._extract_sections(full_answer)
+        return full_answer, summary, detail
+
+    # ── Private ──────────────────────────────────────────────────────────────
+
+    def _apply_row_limit(self, enumeration: str, limit: int) -> str:
+        """
+        Cap the enumeration to at most `limit` numbered entries per section.
+        Entries are lines that start with whitespace + a digit (e.g. "  1. col: val").
+        """
+        lines = enumeration.splitlines()
+        output: list[str] = []
+        entry_count = 0
+        truncated = False
+
+        for line in lines:
+            stripped = line.lstrip()
+            # Section header (### PRIMARY ...)
+            if stripped.startswith("###"):
+                entry_count = 0
+                truncated = False
+                output.append(line)
+                continue
+
+            is_entry = stripped and stripped[0].isdigit() and "." in stripped[:4]
+            if is_entry:
+                entry_count += 1
+                if entry_count > limit:
+                    if not truncated:
+                        output.append(f"  [... truncated at {limit} rows]")
+                        truncated = True
+                    continue
+
+            output.append(line)
+
+        return "\n".join(output)
+
+    def _extract_sections(self, text: str) -> tuple[str | None, str | None]:
+        """
+        Parse 'QUICK SUMMARY: ...\n\nANALYSIS:\n...' from LLM output.
+        Returns (summary_text, analysis_text) or (None, None) if not found.
+        """
+        summary: str | None = None
+        detail: str | None = None
+
+        if "QUICK SUMMARY:" in text:
+            after_qs = text.split("QUICK SUMMARY:", 1)[1]
+            # Summary ends at the next blank line or ANALYSIS:
+            for separator in ["\n\nANALYSIS:", "\nANALYSIS:", "\n\n"]:
+                if separator in after_qs:
+                    summary = after_qs.split(separator, 1)[0].strip()
+                    break
+            else:
+                summary = after_qs.strip()
+
+        if "ANALYSIS:" in text:
+            detail = text.split("ANALYSIS:", 1)[1].strip()
+
+        return summary, detail
 
     # ── Private ──────────────────────────────────────────────────────────────
 

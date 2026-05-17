@@ -49,10 +49,17 @@ class FormulaEngine:
 
         substitutions = self._build_substitutions(formula, context)
         try:
-            return formula.expression.format(**substitutions)
+            expr = formula.expression.format(**substitutions)
         except KeyError as e:
             logger.error(f"Formula {formula_name} missing substitution key: {e}")
             return None
+
+        # Window formulas wrap the inner expression with SUM(...) OVER () to
+        # compute a grand total alongside per-row aggregates.
+        if formula.window:
+            expr = f"SUM({expr}) OVER ()"
+
+        return expr
 
     def get_display_label(self, formula_name: str) -> str:
         formula = self.registry.get_formula(formula_name)

@@ -77,11 +77,16 @@ class ChatbotChain:
             execution_result.applied_rules = intent.applied_rules
 
             # Stage 4: Generate NL response
-            answer = self.responder.respond(execution_result, intent, question)
+            answer, summary, detail = self.responder.respond(
+                execution_result, intent, question
+            )
 
             return ChatResponse(
                 question=question,
                 answer=answer,
+                summary=summary,
+                detail=detail,
+                tabular=execution_result.programmatic_enumeration,
                 success=True,
                 sql_queries=[{"sql": q.sql, "table": q.table, "channel": q.channel} for q in queries],
                 total_rows=execution_result.total_rows,

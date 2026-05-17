@@ -17,6 +17,7 @@ class HavingConfig(BaseModel):
     type: str          # "vs_average" | "gap_to_target" | "metric_comparison"
     polarity: Optional[str] = None   # "positive" | "negative" | None
     conditions: list[HavingCondition] = Field(default_factory=list)
+    condition_join: str = "AND"       # "AND" | "OR" — how multiple conditions are combined
 
 
 class DateRange(BaseModel):

@@ -123,15 +123,25 @@ class QueryBuilder:
 
         for dim_name, value in intent.filters.items():
             col = self.registry.get_db_column(dim_name)
+            dim = self.registry.get_dimension(dim_name)
             if col:
                 safe_value = value.replace("'", "''")
-                conditions.append(f"{col} = '{safe_value}'")
+                if dim and dim.filter_mode == "ilike":
+                    conditions.append(f"{col} ILIKE '%{safe_value}%'")
+                else:
+                    conditions.append(f"{col} = '{safe_value}'")
 
-        if intent.date_range:
-            date_col = self.registry.get_date_column(table)
-            if date_col:
+        date_col = self.registry.get_date_column(table)
+        if intent.date_range and date_col:
+            conditions.append(
+                f"{date_col} BETWEEN '{intent.date_range.start}' AND '{intent.date_range.end}'"
+            )
+        elif date_col:
+            # Apply snapshot mode if configured and no explicit date range given
+            table_meta = self.registry.get_table(table)
+            if table_meta and table_meta.date_mode == "snapshot":
                 conditions.append(
-                    f"{date_col} BETWEEN '{intent.date_range.start}' AND '{intent.date_range.end}'"
+                    f"{date_col} = (SELECT MAX({date_col}) FROM {table})"
                 )
 
         return ("WHERE " + " AND ".join(conditions)) if conditions else ""

@@ -8,6 +8,7 @@ import logging
 from langchain_community.utilities import SQLDatabase
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from models.query import BuiltQuery, QueryResult, ExecutionResult
+from engine.pipeline.result_merger import ResultMerger
 
 logger = logging.getLogger(__name__)
 
@@ -25,17 +26,18 @@ class QueryExecutor:
     def __init__(self, db: SQLDatabase):
         self.db = db
         self.sql_tool = QuerySQLDataBaseTool(db=db)
+        self._merger = ResultMerger()
 
     def execute(self, queries: list[BuiltQuery]) -> ExecutionResult:
-        results = []
-        total_rows = 0
-
+        raw_results = []
         for query in queries:
             result = self._run_one(query)
-            results.append(result)
-            if result.success:
-                total_rows += result.row_count
+            raw_results.append(result)
 
+        # Merge results from the same channel that span multiple tables
+        results = self._merge_by_channel(raw_results)
+
+        total_rows = sum(r.row_count for r in results if r.success)
         enumeration = self._build_programmatic_enumeration(results)
 
         return ExecutionResult(
@@ -43,6 +45,28 @@ class QueryExecutor:
             total_rows=total_rows,
             programmatic_enumeration=enumeration,
         )
+
+    # ── Merge helper ─────────────────────────────────────────────────────────
+
+    def _merge_by_channel(self, results: list[QueryResult]) -> list[QueryResult]:
+        """
+        Group results by channel. If more than one successful result exists for
+        the same channel, merge them via ResultMerger. Otherwise pass through.
+        """
+        from collections import defaultdict
+        groups: dict[str, list[QueryResult]] = defaultdict(list)
+        for r in results:
+            groups[r.query.channel].append(r)
+
+        merged: list[QueryResult] = []
+        for channel, group in groups.items():
+            successful = [r for r in group if r.success and r.rows]
+            if len(successful) > 1:
+                merged.append(self._merger.merge(successful))
+            else:
+                merged.extend(group)
+
+        return merged
 
     # ── Private ──────────────────────────────────────────────────────────────
 

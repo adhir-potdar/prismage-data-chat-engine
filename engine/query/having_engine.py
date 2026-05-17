@@ -77,9 +77,11 @@ class HavingEngine:
         if not clauses:
             return ""
 
-        join = "AND"
-        pattern = self.patterns.get("metric_comparison")
-        if pattern:
-            join = pattern.multi_condition_join
+        # Prefer the condition_join from the parsed intent; fall back to the
+        # pattern-level default defined in business_rules.json.
+        join = having.condition_join if having.condition_join else "AND"
+        if not join:
+            pattern = self.patterns.get("metric_comparison")
+            join = pattern.multi_condition_join if pattern else "AND"
 
         return "HAVING " + f" {join} ".join(clauses)

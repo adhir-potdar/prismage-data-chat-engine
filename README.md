@@ -31,6 +31,11 @@ User: "Which regions are both below target and below last year MTD?"
   supports LangSmith Hub prompt versioning and regression datasets.
 - **Multi-domain examples** — generic e-commerce config and an FMCG sales example
   (primary/secondary channel separation, MTD/LY comparisons) included out of the box.
+- **Plugin system** — package a domain as a self-contained plugin directory with
+  `plugin.json`, metadata, prompts, and optional capability overrides. Load by name with
+  `build_plugin_engine("my-plugin")` or load all plugins at once with `build_multi_engine()`.
+- **Engine capability overrides** — plugins can subclass `EngineCapabilities` to change
+  how specific SQL clauses are built (e.g. snapshot date filter) without touching engine code.
 
 ## Quick Start
 
@@ -91,6 +96,11 @@ prismage-data-chat-engine/
 │   ├── prompts/
 │   │   ├── prompt_library.py      # PromptLibrary — loads JSON or LangSmith Hub prompts
 │   │   └── prompt_builder.py      # PromptBuilder — renders Jinja2 with live metadata
+│   ├── capabilities/
+│   │   └── base.py                # EngineCapabilities — overridable SQL-building behaviours
+│   ├── plugins/
+│   │   ├── loader.py              # PluginLoader — loads plugin directory into ChatbotChain
+│   │   └── registry.py            # PluginRegistry — multi-plugin dispatch
 │   └── chains/
 │       └── chatbot_chain.py       # ChatbotChain — orchestrates all stages + fallback
 │
@@ -100,7 +110,11 @@ prismage-data-chat-engine/
 │   └── embeddings.py              # create_embeddings() factory (OpenAI / Voyage)
 │
 ├── api/
-│   └── chatbot.py                 # build_engine() public API + interactive CLI
+│   └── chatbot.py                 # build_engine(), build_plugin_engine(), build_multi_engine()
+│
+├── plugins/
+│   ├── empty-plugin/              # starter template — copy and rename to create a new plugin
+│   └── <your-plugin>/             # one directory per domain plugin
 │
 ├── examples/
 │   ├── ecommerce/                 # Self-contained e-commerce domain example
@@ -123,29 +137,56 @@ prismage-data-chat-engine/
 └── requirements.txt
 ```
 
-## Adapting to a New Domain
+## Plugin System
 
-1. Copy `config/metadata/` to your domain directory (e.g. `my_domain/config/metadata/`).
-2. Edit the five JSON files to describe your schema:
-   - `dimensions.json` — your grouping columns and aliases
-   - `metrics.json` — your KPIs with categories and formula refs
-   - `formulas.json` — SQL expression templates for derived metrics
-   - `tables.json` — your actual database tables with dimension/metric membership
-   - `business_rules.json` — domain context and trigger-action rules
-3. Point `build_engine()` at your config directory:
-   ```python
-   from api.chatbot import build_engine
+The recommended way to onboard a new domain is to create a plugin — a self-contained
+directory under `plugins/` that bundles metadata, prompts, and optional capability overrides.
 
-   # Default: semantic embedding routing (requires OPENAI_API_KEY)
-   engine = build_engine(config_dir="my_domain/config/metadata")
+```bash
+# 1. Copy the starter template
+cp -r plugins/empty-plugin plugins/my-plugin
 
-   # Optional: switch to deterministic affinity routing (no embeddings needed)
-   engine = build_engine(config_dir="my_domain/config/metadata", router_mode="affinity")
+# 2. Edit plugin.json — set name and description
+# 3. Fill in config/metadata/ JSON files (dimensions, metrics, formulas, tables, rules)
+# 4. Tune config/prompts/ templates
+# 5. (Optional) override SQL behaviours in capabilities.py
+```
 
-   response = engine.answer("Show top 5 products by revenue this month")
-   print(response.answer)
-   ```
-4. All engine parameters can also be set via `.env` — copy `.env.example` and fill in your values.
+**Load a single plugin:**
+
+```python
+from api.chatbot import build_plugin_engine
+
+engine = build_plugin_engine("my-plugin")
+response = engine.answer("Show top 5 products by revenue this month")
+print(response.summary)
+print(response.detail)
+```
+
+**Load all plugins at once:**
+
+```python
+from api.chatbot import build_multi_engine
+
+registry = build_multi_engine()                            # auto-discovers all plugins/
+response = registry.answer("my-plugin", "Top 5 products by revenue")
+```
+
+**Use without the plugin system** (direct config directory):
+
+```python
+from api.chatbot import build_engine
+
+engine = build_engine(config_dir="my_domain/config/metadata")
+response = engine.answer("Show top 5 products by revenue this month")
+```
+
+All engine parameters (`router_mode`, `llm_provider`, `llm_model`, etc.) can also be set
+via `.env` — copy `.env.example` and fill in your values.
+
+See [DESIGN.md](DESIGN.md) → Plugin System and Engine Capabilities sections for the full
+architecture, `PluginLoader` internals, `PluginRegistry`, and how to add new overridable
+engine behaviours.
 
 ## Running Tests
 
@@ -157,7 +198,7 @@ pytest tests/
 
 See [DESIGN.md](DESIGN.md) for the full architecture walkthrough, pipeline diagram, metadata
 schema reference, business rules guide, formula engine, LangChain/LangSmith integration details,
-and onboarding guide.
+plugin system internals, engine capabilities override pattern, and onboarding guide.
 
 ## License
 

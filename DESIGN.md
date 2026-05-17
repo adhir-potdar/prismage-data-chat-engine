@@ -18,6 +18,8 @@
 14. [Prompt System](#prompt-system)
 15. [Programmatic Enumeration](#programmatic-enumeration)
 16. [Onboarding a New Domain](#onboarding-a-new-domain)
+17. [Plugin System](#plugin-system)
+18. [Engine Capabilities](#engine-capabilities)
 
 ---
 
@@ -815,3 +817,194 @@ It checks:
 - All rule action `formula` and `metrics` references exist in metadata
 
 Fix any errors reported before running the engine.
+
+---
+
+## Plugin System
+
+The plugin system packages a domain config (metadata + prompts + capabilities) into a
+self-contained directory that the engine loads by name. This separates domain knowledge
+from engine code and allows multiple domains to be served from one engine instance.
+
+### Plugin directory layout
+
+```
+plugins/
+└── my-plugin/
+    ├── plugin.json            # manifest — name, version, config/prompts paths
+    ├── __init__.py            # Python package marker
+    ├── capabilities.py        # optional — EngineCapabilities subclass
+    ├── readme.txt             # plugin documentation
+    ├── config/
+    │   ├── metadata/          # same 5 JSON files as a standalone domain
+    │   └── prompts/           # question_parser.json, nl_response.json
+    ├── docs/                  # optional domain documentation
+    └── tests/                 # optional test scripts
+```
+
+**`plugin.json` fields:**
+
+| Field | Required | Description |
+|---|---|---|
+| `name` | yes | Plugin identifier — must match directory name |
+| `version` | yes | Semver string |
+| `description` | yes | One-line summary |
+| `config_dir` | yes | Relative path to metadata JSON directory |
+| `prompts_dir` | yes | Relative path to prompt JSON directory |
+| `capabilities` | no | Relative path to capabilities override file |
+| `docs_dir` | no | Relative path to docs directory |
+| `tests_dir` | no | Relative path to tests directory |
+| `docs` | no | Map of doc type → relative path |
+| `tests` | no | Map of test type → relative path |
+
+### Loading a plugin
+
+**Single plugin:**
+
+```python
+from api.chatbot import build_plugin_engine
+
+engine = build_plugin_engine("my-plugin")
+response = engine.answer("Show top 5 products by revenue")
+print(response.answer)
+```
+
+`build_plugin_engine(plugin, plugins_root="plugins")` resolves the plugin directory,
+reads `plugin.json`, and delegates to `PluginLoader.load()`.
+
+**All plugins at once:**
+
+```python
+from api.chatbot import build_multi_engine
+
+registry = build_multi_engine()          # scans plugins/ for all plugin.json entries
+response = registry.answer("my-plugin", "Show top 5 products by revenue")
+```
+
+`build_multi_engine()` returns a `PluginRegistry`. Every subdirectory under `plugins/`
+that contains `plugin.json` is loaded automatically. Failed plugins are logged and skipped
+so one broken plugin does not prevent others from loading.
+
+### PluginLoader internals
+
+`engine/plugins/loader.py` — `PluginLoader.load(plugin_dir)`:
+
+1. Reads `plugin.json` to resolve `config_dir` and `prompts_dir`.
+2. Calls `_load_capabilities(plugin_path)` — see [Engine Capabilities](#engine-capabilities).
+3. Delegates to `api.chatbot.build_engine(config_dir, prompts_dir, capabilities=...)`.
+4. Logs the plugin name and resolved capabilities class.
+
+No plugin-specific logic lives in the loader — all engine wiring is handled by `build_engine()`.
+
+### PluginRegistry
+
+`engine/plugins/registry.py` — holds named `ChatbotChain` instances:
+
+```python
+registry.register("my-plugin", chain)  # called by build_multi_engine()
+registry.names()                        # ["my-plugin", ...]
+response = registry.answer("my-plugin", question)
+```
+
+If the plugin name is not found, `.answer()` returns a `ChatResponse` with
+`success=False` and an informative error message listing available plugins.
+
+### Starter template
+
+`plugins/empty-plugin/` is a ready-to-copy starter template. Copy it, rename it, fill in
+the five JSON config files, and optionally add capability overrides. See
+`plugins/empty-plugin/readme.txt` for the Quick Start steps.
+
+---
+
+## Engine Capabilities
+
+`EngineCapabilities` (`engine/capabilities/base.py`) is a base class that defines
+overridable SQL-building behaviours. Each method has a generic default that is correct
+for standard time-series tables. Plugins that require non-standard SQL (e.g. periodic
+snapshot tables) subclass `EngineCapabilities` in their `capabilities.py` and override
+only the methods they need.
+
+### How capabilities are injected
+
+```
+build_plugin_engine("my-plugin")
+    └─ PluginLoader.load()
+           └─ _load_capabilities(plugin_path)
+                  ├─ capabilities.py absent?  → EngineCapabilities()   (engine defaults)
+                  ├─ capabilities.py present? → importlib loads module
+                  │      → finds first class that is a proper subclass of EngineCapabilities
+                  │      → instantiates it → MyPluginCapabilities()
+                  └─ passes instance to build_engine(capabilities=MyPluginCapabilities())
+                         └─ QueryBuilder(..., capabilities=MyPluginCapabilities())
+                                └─ _build_where() delegates to capabilities methods
+```
+
+`importlib.util.spec_from_file_location` is used so `capabilities.py` does not need to
+be on `sys.path`. If the file fails to import, a warning is logged and engine defaults
+are used — the plugin still loads.
+
+### Currently overridable methods
+
+**`build_date_filter(table, date_col, date_range, table_meta) → str`**
+
+Called when `intent.date_range` is set and `date_col` is known.
+
+| | SQL |
+|---|---|
+| Default | `date_col BETWEEN 'start' AND 'end'` |
+| Override example | `date_col = (SELECT MAX(date_col) FROM table WHERE date_col >= start AND date_col <= end)` |
+
+When to override: your table stores periodic snapshots (one complete picture per load
+date). `BETWEEN` would span multiple load dates and inflate totals. Use `MAX(date_col)
+within range` to select only the latest snapshot in the requested period.
+
+**`build_snapshot_filter(table, date_col, table_meta) → str`**
+
+Called when no date range is given and the table has `date_mode = "snapshot"` in
+`tables.json`.
+
+| | SQL |
+|---|---|
+| Default | `date_col = (SELECT MAX(date_col) FROM table)` |
+
+Override when you need a different "latest row" strategy (e.g. a separate audit table
+that tracks the last loaded date per source table).
+
+### Adding a new overridable behaviour
+
+1. Add a method with a sensible generic default to `engine/capabilities/base.py`.
+2. Replace the hardcoded logic in the relevant engine file with
+   `self.capabilities.<method>(...)`.
+3. Override the method in your plugin's `capabilities.py` when needed.
+
+```python
+# 1. engine/capabilities/base.py
+def build_null_filter(self, col: str) -> str:
+    return f"{col} IS NOT NULL"
+
+# 2. engine/query/builder.py
+conditions.append(self.capabilities.build_null_filter(col))
+
+# 3. plugins/my-plugin/capabilities.py
+def build_null_filter(self, col):
+    return f"({col} IS NOT NULL AND {col} NOT IN ('', 'N/A', 'null'))"
+```
+
+### QueryBuilder integration points
+
+`engine/query/builder.py` uses capabilities in `_build_where()`:
+
+```
+_build_where(table, intent)
+    │
+    ├─ intent.date_range set AND date_col known
+    │       → capabilities.build_date_filter(table, date_col, intent.date_range, table_meta)
+    │
+    └─ no date_range AND table.date_mode == "snapshot"
+            → capabilities.build_snapshot_filter(table, date_col, table_meta)
+```
+
+All other `QueryBuilder` logic (SELECT, GROUP BY, HAVING, ORDER BY, LIMIT) uses engine
+defaults and is not routed through capabilities. Extend `EngineCapabilities` to make
+additional clauses overridable.

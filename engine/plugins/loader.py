@@ -5,12 +5,16 @@ A plugin is a self-contained directory with:
     plugin.json       — manifest (name, version, config_dir, prompts_dir)
     config/metadata/  — 5 JSON metadata files
     config/prompts/   — prompt JSON files
+    capabilities.py   — optional; subclass of EngineCapabilities to override
+                        default engine behaviours (e.g. date filter strategy)
     __init__.py       — optional; can expose plugin-level helpers
 """
 from __future__ import annotations
+import importlib.util
 import json
 import logging
 from pathlib import Path
+from engine.capabilities.base import EngineCapabilities
 from engine.chains.chatbot_chain import ChatbotChain
 
 logger = logging.getLogger(__name__)
@@ -22,7 +26,7 @@ class PluginLoader:
 
     All engine wiring is delegated to api.chatbot.build_engine() so that
     plugin loading stays consistent with the standard engine factory and
-    zero Haldiram-specific logic leaks into this file.
+    zero plugin-specific logic leaks into this file.
     """
 
     def load(
@@ -52,8 +56,12 @@ class PluginLoader:
 
         config_dir = str(plugin_path / config_subdir)
         prompts_dir = str(plugin_path / prompts_subdir)
+        capabilities = self._load_capabilities(plugin_path)
 
-        logger.info(f"Loading plugin '{plugin_name}' from {plugin_path}")
+        logger.info(
+            f"Loading plugin '{plugin_name}' from {plugin_path} "
+            f"with capabilities: {type(capabilities).__name__}"
+        )
 
         # Defer to the standard engine factory — no plugin-specific logic here
         from api.chatbot import build_engine
@@ -63,6 +71,7 @@ class PluginLoader:
             connection_string=connection_string,
             llm_provider=llm_provider,
             llm_model=llm_model,
+            capabilities=capabilities,
             **kwargs,
         )
 
@@ -77,3 +86,34 @@ class PluginLoader:
             )
         with open(manifest_path) as f:
             return json.load(f)
+
+    def _load_capabilities(self, plugin_path: Path) -> EngineCapabilities:
+        """
+        Load plugin capabilities from capabilities.py if present.
+
+        Scans the module for the first class that is a proper subclass of
+        EngineCapabilities, instantiates it, and returns it.  Falls back to
+        the default EngineCapabilities instance when no override is found.
+        """
+        cap_file = plugin_path / "capabilities.py"
+        if not cap_file.exists():
+            return EngineCapabilities()
+
+        spec = importlib.util.spec_from_file_location("_plugin_capabilities", cap_file)
+        mod = importlib.util.module_from_spec(spec)
+        try:
+            spec.loader.exec_module(mod)
+        except Exception as e:
+            logger.warning(f"Failed to load capabilities.py from {plugin_path}: {e}")
+            return EngineCapabilities()
+
+        for obj in vars(mod).values():
+            if (
+                isinstance(obj, type)
+                and issubclass(obj, EngineCapabilities)
+                and obj is not EngineCapabilities
+            ):
+                logger.debug(f"Using plugin capabilities class: {obj.__name__}")
+                return obj()
+
+        return EngineCapabilities()

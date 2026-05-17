@@ -39,6 +39,7 @@ def build_engine(
     embedding_model: str | None = None,
     embedding_cache_path: str | None = None,
     embedding_top_k: int | None = None,
+    capabilities=None,
 ) -> ChatbotChain:
     """
     Build and wire the full Prismage engine from config.
@@ -113,7 +114,10 @@ def build_engine(
 
     formula_engine = FormulaEngine(registry)
     having_engine = HavingEngine(registry, config.having_patterns)
-    query_builder = QueryBuilder(registry, router, formula_engine, having_engine, context)
+    if capabilities is None:
+        from engine.capabilities.base import EngineCapabilities
+        capabilities = EngineCapabilities()
+    query_builder = QueryBuilder(registry, router, formula_engine, having_engine, context, capabilities)
 
     # ── Pipeline stages ──────────────────────────────────────────────────────
     parser = QuestionParser(llm, builder)

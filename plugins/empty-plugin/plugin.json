@@ -4,6 +4,7 @@
   "description": "One-line description of what this plugin does",
   "config_dir": "config/metadata",
   "prompts_dir": "config/prompts",
+  "capabilities": "capabilities.py",
   "docs_dir": "docs",
   "tests_dir": "tests",
   "docs": {},

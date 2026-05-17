@@ -10,6 +10,7 @@ DIRECTORY STRUCTURE
 your-plugin/
   plugin.json                        — manifest (required)
   __init__.py                        — empty, marks as Python package
+  capabilities.py                    — optional; override engine SQL-building behaviours
   readme.txt                         — this file; document your plugin here
   config/
     metadata/
@@ -45,7 +46,11 @@ QUICK START
      - question_parser.json  — adjust instructions for your domain
      - nl_response.json      — adjust output formatting for your domain
 
-5. Run it:
+5. (Optional) Override engine capabilities in capabilities.py:
+     Only needed if your DB requires non-standard SQL construction.
+     See CAPABILITY OVERRIDES section below for details.
+
+6. Run it:
      cd /path/to/prismage-data-chat-engine
      DATABASE_URL=postgresql://... python -c "
      from api.chatbot import build_plugin_engine
@@ -82,6 +87,9 @@ Snapshot date mode
   Set "date_mode": "snapshot" on a table to automatically filter to the
   latest loaded date (WHERE time_key = SELECT MAX(time_key) FROM table).
   Without this, queries with no date filter aggregate across all dates.
+  When a date range is given, default engine behaviour is BETWEEN. Override
+  build_date_filter() in capabilities.py to use MAX within range instead
+  (needed when your table stores periodic snapshots, not incremental rows).
 
 Business rules
   Rules fire between Stage 1 (parse) and Stage 2 (build SQL). They can:
@@ -102,6 +110,42 @@ Prompt templates (Jinja2)
   Variables available in nl_response.json:
     {{ enumeration }}      — tabular query results as text
     {{ domain_context }}   — from business_rules.json
+
+
+CAPABILITY OVERRIDES
+--------------------
+capabilities.py lets a plugin change how the engine builds specific SQL
+clauses without modifying the shared engine code.
+
+How it works:
+  1. Create capabilities.py in your plugin root (already present in this template).
+  2. Uncomment and rename the example class, which extends EngineCapabilities.
+  3. Override only the methods you need; all others use the engine defaults.
+  4. The loader auto-detects capabilities.py and injects your class into the
+     query builder at startup.
+
+Currently overridable methods (defined in engine/capabilities/base.py):
+
+  build_date_filter(table, date_col, date_range, table_meta) -> str
+    When to override: your table stores periodic snapshots (one complete
+    picture per load date). A BETWEEN filter would span multiple loads and
+    inflate totals. Override to use MAX(date_col) within the range instead.
+
+    Default:  WHERE date_col BETWEEN 'start' AND 'end'
+    Override: WHERE date_col = (SELECT MAX(date_col) FROM table
+                                WHERE date_col >= start AND date_col <= end)
+
+  build_snapshot_filter(table, date_col, table_meta) -> str
+    When to override: you need a different "latest row" strategy when no
+    date range is given and the table has date_mode = "snapshot".
+
+    Default:  WHERE date_col = (SELECT MAX(date_col) FROM table)
+
+Adding new overridable behaviours (engine change required):
+  1. Add a method with a sensible default to engine/capabilities/base.py
+  2. Replace the hardcoded logic in the relevant engine file with
+     self.capabilities.<method>(...)
+  3. Override the new method in your plugin's capabilities.py
 
 
 CHATRESPONSE FIELDS

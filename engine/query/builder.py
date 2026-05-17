@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 from models.intent import ParsedIntent
 from models.query import BuiltQuery
+from engine.capabilities.base import EngineCapabilities
 from engine.metadata.registry import MetadataRegistry
 from engine.query.router import TableRouter
 from engine.query.formula_engine import FormulaEngine, QueryContext
@@ -37,12 +38,14 @@ class QueryBuilder:
         formula_engine: FormulaEngine,
         having_engine: HavingEngine,
         context: QueryContext | None = None,
+        capabilities: EngineCapabilities | None = None,
     ):
         self.registry = registry
         self.router = router
         self.formula_engine = formula_engine
         self.having_engine = having_engine
         self.context = context or QueryContext()
+        self.capabilities = capabilities or EngineCapabilities()
 
     def build(self, intent: ParsedIntent) -> list[BuiltQuery]:
         table_groups = self.router.resolve(intent)
@@ -108,8 +111,9 @@ class QueryBuilder:
 
         # Percentage and formula metrics
         for f_name in intent.formula_metrics:
+            if not self.registry.table_has_metric(table, f_name):
+                continue
             expr = self.formula_engine.expand(f_name, self.context)
-            label = self.formula_engine.get_display_label(f_name)
             if expr:
                 alias = f_name.lower().replace(" ", "_")
                 parts.append(f"({expr}) AS {alias}")
@@ -132,17 +136,15 @@ class QueryBuilder:
                     conditions.append(f"{col} = '{safe_value}'")
 
         date_col = self.registry.get_date_column(table)
+        table_meta = self.registry.get_table(table)
         if intent.date_range and date_col:
             conditions.append(
-                f"{date_col} BETWEEN '{intent.date_range.start}' AND '{intent.date_range.end}'"
+                self.capabilities.build_date_filter(table, date_col, intent.date_range, table_meta)
             )
-        elif date_col:
-            # Apply snapshot mode if configured and no explicit date range given
-            table_meta = self.registry.get_table(table)
-            if table_meta and table_meta.date_mode == "snapshot":
-                conditions.append(
-                    f"{date_col} = (SELECT MAX({date_col}) FROM {table})"
-                )
+        elif date_col and table_meta and table_meta.date_mode == "snapshot":
+            conditions.append(
+                self.capabilities.build_snapshot_filter(table, date_col, table_meta)
+            )
 
         return ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
@@ -161,8 +163,15 @@ class QueryBuilder:
     def _build_order_by(self, intent: ParsedIntent) -> str:
         if not intent.sort:
             return ""
-        col = self.registry.get_metric_column(intent.sort.metric)
-        agg = self.registry.get_aggregate_fn(intent.sort.metric)
+        metric = intent.sort.metric
+        col = self.registry.get_metric_column(metric)
+        agg = self.registry.get_aggregate_fn(metric)
         if col and agg:
             return f"ORDER BY {agg}({col}) {intent.sort.direction}"
+        # Formula / percentage metric — expand and use the expression directly
+        m = self.registry.get_metric(metric)
+        if m and m.formula_ref:
+            expr = self.formula_engine.expand(m.formula_ref, self.context)
+            if expr:
+                return f"ORDER BY ({expr}) {intent.sort.direction}"
         return ""

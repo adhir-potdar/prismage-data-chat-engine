@@ -132,7 +132,7 @@ prismage-data-chat-engine/
 │   └── test_pipeline.py
 │
 ├── .env.example                   # All PRISMAGE_* environment variables documented
-├── DESIGN.md                      # Detailed architecture and design document
+├── docs/DESIGN.md                 # Detailed architecture and design document
 ├── pyproject.toml
 └── requirements.txt
 ```
@@ -184,7 +184,7 @@ response = engine.answer("Show top 5 products by revenue this month")
 All engine parameters (`router_mode`, `llm_provider`, `llm_model`, etc.) can also be set
 via `.env` — copy `.env.example` and fill in your values.
 
-See [DESIGN.md](DESIGN.md) → Plugin System and Engine Capabilities sections for the full
+See [DESIGN.md](docs/DESIGN.md) → Plugin System and Engine Capabilities sections for the full
 architecture, `PluginLoader` internals, `PluginRegistry`, and how to add new overridable
 engine behaviours.
 
@@ -196,7 +196,7 @@ pytest tests/
 
 ## Design
 
-See [DESIGN.md](DESIGN.md) for the full architecture walkthrough, pipeline diagram, metadata
+See [DESIGN.md](docs/DESIGN.md) for the full architecture walkthrough, pipeline diagram, metadata
 schema reference, business rules guide, formula engine, LangChain/LangSmith integration details,
 plugin system internals, engine capabilities override pattern, and onboarding guide.
 

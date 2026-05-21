@@ -579,26 +579,65 @@ lists.
   Dimensions: region(zone, area), product_name(item, sku) |
   Metrics: revenue(sales, income), orders_count(order volume)
   ```
+  Dimension and metric aliases (up to 3 per item) are included so the embedding
+  captures natural language synonyms, not just canonical names.
 - Embeds all documents using the configured embeddings model
   (default: OpenAI `text-embedding-3-small`).
 - Caches vectors to disk as JSON (default: `.cache/metadata_embeddings.json`).
   The cache is keyed by an MD5 hash of all document content — rebuilt automatically
   when any dimension, metric, or table config changes.
 
-`EmbeddingTableRouter`:
-- Constructs a query string from `intent.dimensions + intent.metrics + intent.formula_metrics`.
-- Calls `store.find_tables(query, top_k)` and ranks by cosine similarity.
-- Applies `intent.channels` filter after ranking.
-- Returns the top-K tables as `TableGroup` objects.
+**Cache lifecycle:**
+
+```
+store.build()  (called once at engine startup)
+  │
+  ├─ _build_documents()        always runs — builds text docs, no API call
+  │
+  ├─ cache file exists?
+  │     YES → read JSON → compare stored MD5 hash vs current doc hash
+  │               MATCH    → load vectors from file, done  ← zero API calls
+  │               MISMATCH → fall through to embed
+  │               CORRUPT  → silently fall through to embed
+  │     NO  → fall through to embed
+  │
+  └─ _embed_and_cache()
+        embeddings.embed_documents([N table docs])  ← ONE OpenAI call, N texts
+        write {hash, vectors} to cache file
+```
+
+**Per-question cost:**
+
+| Operation | When | OpenAI call? |
+|---|---|---|
+| `embed_documents` (table vectors) | Once at first startup, or after config change | Yes — N texts in one call |
+| Load from cache | Every restart after first build | No |
+| `embed_query` (question vector) | Every question | Yes — 1 text per query |
+
+Table vectors are never re-fetched from the API at runtime — only the question embedding
+is unavoidable per query. `invalidate_cache()` forces a full rebuild on the next
+`build()` call.
+
+`EmbeddingTableRouter` (`engine/query/embedding_router.py`):
+- On every question, embeds the user's raw question text via `store.find_tables(question, top_k)`.
+- Inside `find_tables`: calls `embeddings.embed_query(question)` then computes cosine
+  similarity between the question vector and every cached table vector.
+- Returns up to `top_k` table names sorted by descending similarity score.
+- `EmbeddingTableRouter.resolve()` then applies `intent.channels` filter to the ranked
+  list and returns matching tables as `TableGroup` objects for the query builder.
+
+Note: the question is embedded directly (raw text), not the parsed intent fields.
+This means table routing happens against the original phrasing before any LLM parsing.
 
 **Choosing a mode:**
 
 | | `embedding` (default) | `affinity` |
 |---|---|---|
-| Table selection | Semantic similarity | Exact set intersection |
+| Table selection | Cosine similarity on raw question | Exact set intersection on parsed intent |
 | Requires API on startup | Yes (first run only, then cached) | No |
 | Handles incomplete affinity lists | Yes | No |
 | Deterministic | No (model-dependent) | Yes |
+| Handles unfamiliar phrasing | Yes | Only if aliases cover the phrasing |
 
 ---
 

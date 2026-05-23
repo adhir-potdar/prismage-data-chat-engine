@@ -67,11 +67,36 @@ class QueryBuilder:
         if not select_parts:
             return None
 
+        # Skip table if metrics were requested but none are available on it.
+        # Use explicit registry lookups instead of fragile string heuristics.
+        available_metrics = sum(
+            1 for m in intent.metrics if self.registry.table_has_metric(table, m)
+        )
+        available_formula_metrics = sum(
+            1 for f in intent.formula_metrics if self.registry.table_has_metric(table, f)
+        )
+        if (intent.metrics or intent.formula_metrics) and (available_metrics + available_formula_metrics) == 0:
+            logger.debug(f"Skipping table '{table}': no requested metrics available.")
+            return None
+
+        # Skip table if dimensions were requested but none are available on it.
+        # A query with aggregated metrics but no GROUP BY returns one grand-total
+        # row that cannot be meaningfully merged with grouped results from other tables.
+        available_dimensions = sum(
+            1 for d in intent.dimensions if self.registry.table_has_dimension(table, d)
+        )
+        if intent.dimensions and available_dimensions == 0:
+            logger.debug(f"Skipping table '{table}': no requested dimensions available.")
+            return None
+
         where = self._build_where(intent, table)
-        group_by = self._build_group_by(intent)
-        having = self.having_engine.build(intent.having, table) if intent.having else ""
-        order_by = self._build_order_by(intent)
-        limit = f"LIMIT {intent.limit}" if intent.limit else f"LIMIT {self.DEFAULT_LIMIT}"
+        group_by = self._build_group_by(intent, table)
+        having = self.having_engine.build(intent.having, table, intent.metrics) if intent.having else ""
+        order_by = self._build_order_by(intent, table)
+        # Always fetch DEFAULT_LIMIT rows in SQL; user's intent.limit is applied
+        # post-merge in the NL responder to avoid premature truncation when
+        # results from multiple tables are merged before the final rank/slice.
+        limit = f"LIMIT {self.DEFAULT_LIMIT}"
 
         parts = [
             f"SELECT {', '.join(select_parts)}",
@@ -100,6 +125,8 @@ class QueryBuilder:
             if col and self.registry.table_has_dimension(table, dim):
                 parts.append(col)
 
+        suffix = self.capabilities.get_metric_suffix(table)
+
         # Absolute, average, and cumulative metrics
         for m_name in intent.metrics:
             if not self.registry.table_has_metric(table, m_name):
@@ -107,33 +134,72 @@ class QueryBuilder:
             col = self.registry.get_metric_column(m_name)
             agg = self.registry.get_aggregate_fn(m_name)
             if col and agg:
-                parts.append(f"{agg}({col}) AS {m_name}")
+                parts.append(f"{agg}({col}) AS {m_name}{suffix}")
+            else:
+                # Metric has no db_column — may be a formula metric misrouted into
+                # intent.metrics by the LLM. Expand via formula_ref if available.
+                m_meta = self.registry.get_metric(m_name)
+                if m_meta and m_meta.formula_ref:
+                    expr = self.formula_engine.expand(m_meta.formula_ref, self.context)
+                    if expr:
+                        parts.append(f"({expr}) AS {m_name}{suffix}")
 
         # Percentage and formula metrics
         for f_name in intent.formula_metrics:
             if not self.registry.table_has_metric(table, f_name):
                 continue
+            if not self.registry.get_formula(f_name):
+                # Regular metric mistakenly placed in formula_metrics by the LLM
+                # — already handled by the metrics loop above; skip silently.
+                continue
             expr = self.formula_engine.expand(f_name, self.context)
             if expr:
                 alias = f_name.lower().replace(" ", "_")
-                parts.append(f"({expr}) AS {alias}")
+                parts.append(f"({expr}) AS {alias}{suffix}")
 
         return parts
 
     # ── WHERE ────────────────────────────────────────────────────────────────
 
+    # Placeholder values treated as missing data — excluded from GROUP BY queries
+    _NULL_PLACEHOLDERS = ("'-'", "'N.A.'", "'NA'", "'N/A'")
+
     def _build_where(self, intent: ParsedIntent, table: str) -> str:
         conditions = []
 
         for dim_name, value in intent.filters.items():
+            if not self.registry.table_has_dimension(table, dim_name):
+                continue
             col = self.registry.get_db_column(dim_name)
             dim = self.registry.get_dimension(dim_name)
+            safe_value = str(value).replace("'", "''")
             if col:
-                safe_value = value.replace("'", "''")
                 if dim and dim.filter_mode == "ilike":
                     conditions.append(f"{col} ILIKE '%{safe_value}%'")
                 else:
                     conditions.append(f"{col} = '{safe_value}'")
+            elif dim and dim.hierarchy_name:
+                # Virtual dimension (db_column=None) — OR-expand across all real
+                # dimensions in the same hierarchy that exist in this table.
+                hier_cols = [
+                    self.registry.get_db_column(d)
+                    for d in self.registry.get_dimensions_by_hierarchy(dim.hierarchy_name)
+                    if self.registry.table_has_dimension(table, d)
+                ]
+                if hier_cols:
+                    or_parts = [f"{c} ILIKE '%{safe_value}%'" for c in hier_cols]
+                    conditions.append(f"({' OR '.join(or_parts)})")
+
+        # Exclude null/placeholder rows for all grouped dimensions
+        for dim_name in intent.dimensions:
+            if not self.registry.table_has_dimension(table, dim_name):
+                continue
+            col = self.registry.get_db_column(dim_name)
+            if col:
+                placeholders = ", ".join(self._NULL_PLACEHOLDERS)
+                conditions.append(
+                    f"({col} IS NOT NULL AND {col} NOT IN ({placeholders}))"
+                )
 
         date_col = self.registry.get_date_column(table)
         table_meta = self.registry.get_table(table)
@@ -150,20 +216,23 @@ class QueryBuilder:
 
     # ── GROUP BY ─────────────────────────────────────────────────────────────
 
-    def _build_group_by(self, intent: ParsedIntent) -> str:
+    def _build_group_by(self, intent: ParsedIntent, table: str) -> str:
         cols = []
         for dim in intent.dimensions:
             col = self.registry.get_db_column(dim)
-            if col:
+            if col and self.registry.table_has_dimension(table, dim):
                 cols.append(col)
         return ("GROUP BY " + ", ".join(cols)) if cols else ""
 
     # ── ORDER BY ─────────────────────────────────────────────────────────────
 
-    def _build_order_by(self, intent: ParsedIntent) -> str:
+    def _build_order_by(self, intent: ParsedIntent, table: str) -> str:
         if not intent.sort:
             return ""
         metric = intent.sort.metric
+        # Only add ORDER BY if this table actually has the sort metric
+        if not self.registry.table_has_metric(table, metric):
+            return ""
         col = self.registry.get_metric_column(metric)
         agg = self.registry.get_aggregate_fn(metric)
         if col and agg:

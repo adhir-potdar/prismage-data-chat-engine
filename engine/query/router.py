@@ -26,8 +26,9 @@ class TableRouter:
     4. Return one TableGroup per matching table.
     """
 
-    def __init__(self, registry: MetadataRegistry):
+    def __init__(self, registry: MetadataRegistry, capabilities=None):
         self.registry = registry
+        self._capabilities = capabilities
 
     def resolve(self, intent: ParsedIntent) -> list[TableGroup]:
         all_metrics = intent.metrics + intent.formula_metrics
@@ -36,14 +37,54 @@ class TableRouter:
         if not candidate_tables:
             return []
 
-        # Filter by channels if specified by business rules
-        if intent.channels:
-            filtered = []
-            for table_name in candidate_tables:
-                table = self.registry.get_table(table_name)
-                if table and table.channel in intent.channels:
-                    filtered.append(table_name)
-            candidate_tables = filtered or candidate_tables  # fallback to all if filter removes everything
+        # When no dimension is specified, narrow table candidates:
+        # - If filter dimensions (e.g. sales_person) have specific table affinities,
+        #   prefer those tables (they carry the filter column and will apply the WHERE).
+        # - Otherwise fall back to plugin-configured default tables.
+        no_real_dims = not intent.dimensions
+        if no_real_dims:
+            filter_affinities: set[str] = set()
+            for dim_name in intent.filters:
+                d = self.registry.get_dimension(dim_name)
+                if d and d.table_affinity:
+                    filter_affinities.update(d.table_affinity)
+            if filter_affinities:
+                filtered = [t for t in candidate_tables if t in filter_affinities]
+                candidate_tables = filtered or candidate_tables
+            elif self._capabilities:
+                defaults = self._capabilities.get_default_tables()
+                if defaults:
+                    default_set = set(defaults)
+                    filtered = [t for t in candidate_tables if t in default_set]
+                    candidate_tables = filtered or candidate_tables
+
+        # Filter by channel: intent.channel_filter (from question parser) takes
+        # precedence; intent.channels (from business rules) is a secondary filter.
+        channel_scope = intent.channels[:]
+        if intent.channel_filter and intent.channel_filter not in channel_scope:
+            channel_scope = [intent.channel_filter]
+        if channel_scope:
+            filtered = [t for t in candidate_tables
+                        if self.registry.get_table(t) and
+                           self.registry.get_table(t).channel in channel_scope]
+            candidate_tables = filtered or candidate_tables
+
+        # Filter by table variant (e.g. "value" or "volume") when explicitly
+        # specified — keeps only tables whose variant field matches.
+        # When no variant requested and no dimension grouped, apply the plugin
+        # default variant to avoid merging incompatible types without join keys.
+        if intent.metric_variant:
+            filtered = [t for t in candidate_tables
+                        if self.registry.get_table(t) and
+                           self.registry.get_table(t).variant == intent.metric_variant]
+            candidate_tables = filtered or candidate_tables
+        elif no_real_dims and self._capabilities:  # no dimensions at all
+            default_variant = self._capabilities.get_default_table_variant()
+            if default_variant:
+                filtered = [t for t in candidate_tables
+                            if self.registry.get_table(t) and
+                               self.registry.get_table(t).variant == default_variant]
+                candidate_tables = filtered or candidate_tables
 
         return [
             TableGroup(
@@ -60,24 +101,35 @@ class TableRouter:
     # ── Private ──────────────────────────────────────────────────────────────
 
     def _intersect_affinities(self, dimensions: list[str], metrics: list[str]) -> list[str]:
-        affinity_sets = []
+        # First pass: try primary_tables for dimensions (preferred entity tables).
+        # If the primary_tables intersection is non-empty, use it.
+        # This ensures "top products" routes to product tables, not sales_rep tables.
+        primary_sets = []
+        for dim in dimensions:
+            d = self.registry.get_dimension(dim)
+            if d and d.primary_tables:
+                primary_sets.append(set(d.primary_tables))
 
+        if primary_sets:
+            primary_common = primary_sets[0]
+            for s in primary_sets[1:]:
+                primary_common = primary_common & s
+            if primary_common:
+                # Also intersect with metric affinities to ensure tables have the metrics
+                metric_sets = self._metric_affinity_sets(metrics)
+                if metric_sets:
+                    for s in metric_sets:
+                        primary_common = primary_common & s
+                if primary_common:
+                    return sorted(primary_common)
+
+        # Fall back to full table_affinity intersection
+        affinity_sets = []
         for dim in dimensions:
             d = self.registry.get_dimension(dim)
             if d and d.table_affinity:
                 affinity_sets.append(set(d.table_affinity))
-
-        for metric_name in metrics:
-            m = self.registry.get_metric(metric_name)
-            if m and m.table_affinity:
-                affinity_sets.append(set(m.table_affinity))
-            # For formula metrics, check component affinities
-            f = self.registry.get_formula(metric_name)
-            if f:
-                for component in f.components:
-                    cm = self.registry.get_metric(component)
-                    if cm and cm.table_affinity:
-                        affinity_sets.append(set(cm.table_affinity))
+        affinity_sets.extend(self._metric_affinity_sets(metrics))
 
         if not affinity_sets:
             return []
@@ -87,3 +139,17 @@ class TableRouter:
             common = common & s
 
         return sorted(common)
+
+    def _metric_affinity_sets(self, metrics: list[str]) -> list[set]:
+        sets = []
+        for metric_name in metrics:
+            m = self.registry.get_metric(metric_name)
+            if m and m.table_affinity:
+                sets.append(set(m.table_affinity))
+            f = self.registry.get_formula(metric_name)
+            if f:
+                for component in f.components:
+                    cm = self.registry.get_metric(component)
+                    if cm and cm.table_affinity:
+                        sets.append(set(cm.table_affinity))
+        return sets

@@ -3,8 +3,11 @@ Prismage Data Chat Engine — main entry point.
 Wires together all components and exposes a simple answer() interface.
 """
 from __future__ import annotations
+import logging
 import os
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 from langchain_community.utilities import SQLDatabase
 
 from adapters.database import create_database
@@ -38,7 +41,6 @@ def build_engine(
     embedding_provider: str | None = None,
     embedding_model: str | None = None,
     embedding_cache_path: str | None = None,
-    embedding_top_k: int | None = None,
     capabilities=None,
 ) -> ChatbotChain:
     """
@@ -58,7 +60,6 @@ def build_engine(
         embedding_provider:     "openai" or "voyage"                     (PRISMAGE_EMBEDDING_PROVIDER, default "openai")
         embedding_model:        embedding model name                     (PRISMAGE_EMBEDDING_MODEL, default "text-embedding-3-small")
         embedding_cache_path:   on-disk cache path; "" disables caching  (PRISMAGE_EMBEDDING_CACHE_PATH)
-        embedding_top_k:        top-K tables from embedding search       (PRISMAGE_EMBEDDING_TOP_K, default 3)
 
     Returns:
         ChatbotChain — call .answer(question) to query the engine.
@@ -75,7 +76,6 @@ def build_engine(
     embedding_model = embedding_model or os.getenv("PRISMAGE_EMBEDDING_MODEL", "text-embedding-3-small")
     _cache_env = os.getenv("PRISMAGE_EMBEDDING_CACHE_PATH", ".cache/metadata_embeddings.json")
     embedding_cache_path = embedding_cache_path if embedding_cache_path is not None else (_cache_env or None)
-    embedding_top_k = embedding_top_k or int(os.getenv("PRISMAGE_EMBEDDING_TOP_K", "3"))
     if enable_fallback is None:
         enable_fallback = os.getenv("PRISMAGE_ENABLE_FALLBACK", "true").lower() != "false"
 
@@ -93,13 +93,29 @@ def build_engine(
     conn_str = connection_string or os.getenv("DATABASE_URL")
     if not conn_str:
         raise ValueError("DATABASE_URL env var or connection_string argument is required.")
-    db = create_database(conn_str)
+    db_tables = [t.name for t in config.tables] if config.tables else None
+    try:
+        db = create_database(conn_str, include_tables=db_tables)
+        logger.info("Database connected; scoped to config tables: %s", db_tables)
+    except ValueError as exc:
+        logger.warning(
+            "Config tables not found in database (%s) — falling back to full reflection. "
+            "Run create_tables.py to create missing tables. Details: %s",
+            db_tables,
+            exc,
+        )
+        db = create_database(conn_str)
 
     # ── LLM ───────────────────────────────────────────────────────────────────
     llm = create_llm(provider=llm_provider, model=llm_model)
 
     # ── Query sub-components ─────────────────────────────────────────────────
     context = QueryContext()
+
+    # Resolve capabilities before router so threshold/suffix methods are available
+    if capabilities is None:
+        from engine.capabilities.base import EngineCapabilities
+        capabilities = EngineCapabilities()
 
     if router_mode == "embedding":
         from adapters.embeddings import create_embeddings
@@ -108,19 +124,16 @@ def build_engine(
         emb = create_embeddings(provider=embedding_provider, model=embedding_model)
         store = MetadataEmbeddingStore(config, emb, cache_path=embedding_cache_path)
         store.build()
-        router = EmbeddingTableRouter(store, registry, top_k=embedding_top_k)
+        router = EmbeddingTableRouter(store, registry, capabilities)
     else:
-        router = TableRouter(registry)
+        router = TableRouter(registry, capabilities)
 
     formula_engine = FormulaEngine(registry)
     having_engine = HavingEngine(registry, config.having_patterns)
-    if capabilities is None:
-        from engine.capabilities.base import EngineCapabilities
-        capabilities = EngineCapabilities()
     query_builder = QueryBuilder(registry, router, formula_engine, having_engine, context, capabilities)
 
     # ── Pipeline stages ──────────────────────────────────────────────────────
-    parser = QuestionParser(llm, builder)
+    parser = QuestionParser(llm, builder, capabilities)
     rules_engine = BusinessRulesEngine(config.rules, registry)
     builder_stage = QueryBuilderStage(rules_engine, query_builder)
     executor = QueryExecutor(db)
@@ -129,7 +142,7 @@ def build_engine(
     # ── Fallback (LangChain SQL chain) ────────────────────────────────────────
     fallback = None
     if enable_fallback:
-        from langchain.chains import create_sql_query_chain
+        from langchain_classic.chains.sql_database.query import create_sql_query_chain
         fallback = create_sql_query_chain(llm, db)
 
     return ChatbotChain(parser, builder_stage, executor, responder, fallback)
@@ -241,23 +254,204 @@ def build_multi_engine(
     return registry
 
 
-def main():
-    """Interactive CLI mode."""
-    engine = build_engine()
-    print("Prismage Data Chat Engine — type 'exit' to quit.\n")
-    while True:
-        question = input("You: ").strip()
-        if question.lower() in ("exit", "quit"):
-            break
-        if not question:
+_SEP = "=" * 80
+
+
+def _build_markdown_table(query_results: list) -> str:
+    """
+    Build padded markdown tables from the query_results list in ChatResponse.
+    Each entry is a dict: {channel, columns, rows, row_count}.
+    Numbers are formatted to 2 decimal places; column headers uppercased.
+    """
+    import decimal
+    sections = []
+
+    for result in query_results:
+        channel = result.get("channel", "unknown")
+        rows = result.get("rows", [])
+        columns = result.get("columns", [])
+        row_count = result.get("row_count", len(rows))
+
+        if not rows or not columns:
             continue
-        response: ChatResponse = engine.answer(question)
-        print(f"\nAnswer:\n{response.answer}")
-        if response.used_fallback:
-            print("  [used LangChain fallback SQL chain]")
-        if response.applied_rules:
-            print(f"  [rules applied: {', '.join(response.applied_rules)}]")
-        print()
+
+        # Interleave val/vol pairs: cymtd_val|cymtd_vol|lymtd_val|lymtd_vol|...
+        # Dimension columns (non-numeric) stay first; orphan suffixed cols go last.
+        def _interleave_columns(cols):
+            val_cols = [c for c in cols if c.endswith("_val")]
+            vol_set = {c for c in cols if c.endswith("_vol")}
+            dim_cols = [c for c in cols if not c.endswith("_val") and not c.endswith("_vol")]
+            ordered = list(dim_cols)
+            for vc in val_cols:
+                ordered.append(vc)
+                vol_c = vc[:-4] + "_vol"
+                if vol_c in vol_set:
+                    ordered.append(vol_c)
+                    vol_set.discard(vol_c)
+            ordered.extend(sorted(vol_set))  # orphan vol cols with no matching val
+            return ordered if (val_cols or vol_set) else cols
+
+        columns = _interleave_columns(columns)
+
+        def _fmt(v):
+            if isinstance(v, decimal.Decimal):
+                return f"{float(v):.2f}"
+            if isinstance(v, float):
+                return f"{v:.2f}"
+            return str(v) if v is not None else ""
+
+        formatted = [{col: _fmt(row.get(col)) for col in columns} for row in rows]
+        headers = [col.replace("_", " ").upper() for col in columns]
+
+        # Compute column widths so cells are padded evenly
+        widths = [len(h) for h in headers]
+        for row in formatted:
+            for i, col in enumerate(columns):
+                widths[i] = max(widths[i], len(row[col]))
+
+        hdr = "| " + " | ".join(h.ljust(widths[i]) for i, h in enumerate(headers)) + " |"
+        sep = "|" + "|".join("-" * (w + 2) for w in widths) + "|"
+        data_rows = [
+            "| " + " | ".join(row[col].ljust(widths[i]) for i, col in enumerate(columns)) + " |"
+            for row in formatted
+        ]
+
+        channel_label = channel.replace("_", " ").title()
+        sections.append(
+            f"### {channel_label}\n"
+            f"*Showing {row_count} of {row_count} rows*\n\n"
+            f"**{channel_label} Sales**\n"
+            + hdr + "\n" + sep + "\n" + "\n".join(data_rows)
+        )
+
+    return "\n\n".join(sections)
+
+
+def main():
+    """Interactive CLI mode.
+
+    Usage:
+        python -m api.chatbot                          # generic engine (config/metadata/)
+        python -m api.chatbot --plugin haldiram-sales  # named plugin
+    """
+    import argparse
+    import sys
+    import time
+    from datetime import datetime
+    from pathlib import Path
+
+    parser = argparse.ArgumentParser(description="Prismage Data Chat Engine — interactive CLI")
+    parser.add_argument("--plugin", metavar="NAME", help="Plugin name to load (e.g. haldiram-sales)")
+    parser.add_argument("--include-sql", action="store_true", help="Print the generated SQL queries for each question")
+    args = parser.parse_args()
+
+    if args.plugin:
+        # Validate plugin exists before attempting to load
+        _plugins_root = os.getenv("PRISMAGE_PLUGINS_ROOT", "plugins")
+        _plugin_path = Path(_plugins_root) / args.plugin
+        if not _plugin_path.exists() or not (_plugin_path / "plugin.json").exists():
+            _available = sorted(
+                d.name for d in Path(_plugins_root).iterdir()
+                if d.is_dir() and (d / "plugin.json").exists()
+            ) if Path(_plugins_root).exists() else []
+            print(f"ERROR: Plugin '{args.plugin}' not found in '{_plugins_root}/'.")
+            if _available:
+                print(f"Available plugins: {', '.join(_available)}")
+            else:
+                print(f"No plugins found in '{_plugins_root}/'. Run setup scripts first.")
+            sys.exit(1)
+
+        print(f"Loading plugin '{args.plugin}'...")
+        try:
+            engine = build_plugin_engine(args.plugin)
+        except Exception as e:
+            print(f"ERROR: Failed to load plugin '{args.plugin}': {e}")
+            sys.exit(1)
+        label = args.plugin
+    else:
+        engine = build_engine()
+        label = "generic"
+
+    print(f"Prismage Data Chat Engine [{label}] — type 'exit' to quit.\n")
+
+    try:
+        while True:
+            try:
+                question = input("You: ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print("\nBye!")
+                break
+            if question.lower() in ("exit", "quit"):
+                break
+            if not question:
+                continue
+
+            t_start = time.time()
+            start_dt = datetime.now()
+
+            # ── Header ───────────────────────────────────────────────────────
+            print(f"\n{_SEP}")
+            print(f"⏰ Started at: {start_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"{_SEP}\n")
+
+            # answer(verbose=True) prints STEP 1–4 progress to stdout as it runs
+            response: ChatResponse = engine.answer(question, verbose=True)
+
+            if args.include_sql and response.sql_queries:
+                print(f"\n{_SEP}")
+                print("SQL QUERIES")
+                print(_SEP)
+                for i, q in enumerate(response.sql_queries, 1):
+                    label = q.get("channel") or q.get("table", f"query {i}")
+                    print(f"\n-- Query {i}: {label}")
+                    print(q.get("sql", ""))
+                print(_SEP)
+
+            t_total = time.time() - t_start
+            end_dt = datetime.now()
+
+            # ── Response sections ─────────────────────────────────────────────
+            if not response.success:
+                print(f"\n{_SEP}")
+                print("ERROR")
+                print(_SEP)
+                print(response.error or response.answer)
+            else:
+                if response.summary:
+                    print(f"\n{_SEP}")
+                    print("QUICK SUMMARY")
+                    print(_SEP)
+                    print(response.summary)
+
+                if response.detail:
+                    print(f"\n{_SEP}")
+                    print("ANALYSIS (CONCISE)")
+                    print(_SEP)
+                    print(response.detail)
+                elif response.answer and not response.summary:
+                    # No structured sections — print the full answer
+                    print(f"\n{_SEP}")
+                    print("ANSWER")
+                    print(_SEP)
+                    print(response.answer)
+
+                if response.query_results:
+                    table_str = _build_markdown_table(response.query_results)
+                    if table_str:
+                        print(f"\n{_SEP}")
+                        print("TABULAR OUTPUT")
+                        print(_SEP)
+                        print(table_str)
+                        print(_SEP)
+
+            # ── Footer ────────────────────────────────────────────────────────
+            print(f"\n{_SEP}")
+            print(f"⏰ Completed at: {end_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"⏱️  Total time: {t_total:.2f}s")
+            print(f"{_SEP}\n")
+
+    except KeyboardInterrupt:
+        print("\nBye!")
 
 
 if __name__ == "__main__":

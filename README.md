@@ -188,6 +188,30 @@ See [DESIGN.md](docs/DESIGN.md) → Plugin System and Engine Capabilities sectio
 architecture, `PluginLoader` internals, `PluginRegistry`, and how to add new overridable
 engine behaviours.
 
+## Interactive CLI
+
+`api/chatbot.py` includes a built-in interactive CLI for quick testing without writing any code:
+
+```bash
+# Generic engine (uses config/metadata/)
+python -m api.chatbot
+
+# Named plugin
+python -m api.chatbot --plugin haldiram-sales
+
+# Named plugin — also print the generated SQL for every question
+python -m api.chatbot --plugin haldiram-sales --include-sql
+```
+
+**CLI flags:**
+
+| Flag | Description |
+|---|---|
+| `--plugin NAME` | Load a named plugin from `plugins/<NAME>/` |
+| `--include-sql` | Print the SQL query (or queries) generated for each question |
+
+When `--include-sql` is set, a **SQL QUERIES** block is printed after each response showing the exact SQL sent to the database, labelled by channel (primary / secondary). Useful for debugging parser output and verifying HAVING, GROUP BY, and WHERE clauses.
+
 ## Running Tests
 
 ```bash

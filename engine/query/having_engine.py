@@ -23,28 +23,38 @@ class HavingEngine:
         self.registry = registry
         self.patterns: dict[str, HavingPatternDef] = {p.type: p for p in patterns}
 
-    def build(self, having: HavingConfig, table: str) -> str:
-        handler = {
-            "vs_average": self._build_vs_average,
-            "gap_to_target": self._build_gap_to_target,
-            "metric_comparison": self._build_metric_comparison,
-        }.get(having.type)
-
-        if not handler:
+    def build(self, having: HavingConfig, table: str, metrics: list[str] | None = None) -> str:
+        if having.type == "vs_average":
+            return self._build_vs_average(having, table, metrics)
+        elif having.type == "gap_to_target":
+            return self._build_gap_to_target(having, table)
+        elif having.type == "metric_comparison":
+            return self._build_metric_comparison(having, table)
+        else:
             logger.warning(f"Unknown having type: {having.type}")
             return ""
 
-        return handler(having, table)
-
     # ── Pattern builders ─────────────────────────────────────────────────────
 
-    def _build_vs_average(self, having: HavingConfig, table: str) -> str:
-        if not having.conditions:
+    def _build_vs_average(
+        self, having: HavingConfig, table: str, metrics: list[str] | None = None
+    ) -> str:
+        if having.conditions:
+            cond = having.conditions[0]
+            metric_name = cond.metric1
+            op = cond.operator or ("<" if having.polarity == "negative" else ">")
+        elif metrics:
+            # LLM omitted explicit conditions — infer from intent metrics
+            metric_name = next(
+                (m for m in metrics if self.registry.get_metric_column(m)), None
+            )
+            if not metric_name:
+                return ""
+            op = "<" if having.polarity == "negative" else ">"
+        else:
             return ""
-        cond = having.conditions[0]
-        col = self.registry.get_metric_column(cond.metric1)
-        agg = self.registry.get_aggregate_fn(cond.metric1)
-        op = cond.operator or ("<" if having.polarity == "negative" else ">")
+        col = self.registry.get_metric_column(metric_name)
+        agg = self.registry.get_aggregate_fn(metric_name)
         if not col:
             return ""
         return f"HAVING {agg}({col}) {op} (SELECT AVG({col}) FROM {table})"

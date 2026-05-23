@@ -54,3 +54,59 @@ class EngineCapabilities:
         Default: latest available row globally.
         """
         return f"{date_col} = (SELECT MAX({date_col}) FROM {table})"
+
+    def get_metric_suffix(self, table_name: str) -> str:
+        """
+        Return a suffix to append to each metric column alias in SELECT.
+
+        Default: no suffix (e.g. cymtd → cymtd).
+        Override in plugins that run multiple sub-table variants for the same channel
+        so the ResultMerger can join them without column collisions.
+        Example: a plugin with _val and _vol table variants might return "_val" or "_vol"
+        so cymtd becomes cymtd_val / cymtd_vol in the merged result.
+        """
+        return ""
+
+    def get_default_metrics(self) -> list[str]:
+        """
+        Metrics to use when the LLM extracts none from the question.
+
+        Default: [] (no fallback — leave metrics empty and let the query builder
+        decide or return an error). Override in plugins to provide a sensible
+        business default (e.g. ["fy_25"] for annual sales data).
+        """
+        return []
+
+    def get_embedding_threshold(self) -> float:
+        """
+        Minimum similarity ratio relative to the top-scoring table.
+
+        Tables whose cosine similarity score is below (top_score * threshold)
+        are excluded by the embedding router. Default 0.0 = no filtering.
+
+        Override in plugins with multiple table entity types (e.g. product vs
+        sales_rep tables that share dimensions) to prevent over-routing.
+        Example: return 0.90 to keep only tables within 10% of the top score.
+        """
+        return 0.0
+
+    def get_default_tables(self) -> list[str]:
+        """
+        Tables to use when no dimension is specified in the question.
+
+        Default: [] (no restriction). Override in plugins to designate a compact
+        summary table set for dimension-free aggregate queries so routing does not
+        fan out to all table types simultaneously.
+        """
+        return []
+
+    def get_default_table_variant(self) -> str | None:
+        """
+        Table variant to apply as default when no explicit variant was requested
+        and no dimension is being grouped.
+
+        Default: None (no restriction). Override in plugins where multiple table
+        variants exist (e.g. value vs volume) to avoid merging incompatible
+        variants within the same channel when there are no join keys.
+        """
+        return None

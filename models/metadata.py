@@ -24,8 +24,9 @@ class AggregateFunction(str, Enum):
 class Dimension(BaseModel):
     name: str
     aliases: list[str] = Field(default_factory=list)
-    db_column: str
+    db_column: Optional[str] = None   # None = virtual dimension (expands via hierarchy)
     table_affinity: list[str] = Field(default_factory=list)
+    primary_tables: list[str] = Field(default_factory=list)  # preferred tables when this is the primary entity; if empty, use table_affinity
     hierarchy_name: Optional[str] = None
     hierarchy_level: Optional[int] = None
     filter_mode: Optional[str] = None   # None/"exact" → = 'value'; "ilike" → ILIKE '%value%'
@@ -54,6 +55,7 @@ class Formula(BaseModel):
 class Table(BaseModel):
     name: str
     channel: str
+    variant: Optional[str] = None     # plugin-defined sub-type within a channel (e.g. "value" vs "volume")
     date_column: Optional[str] = None
     description: Optional[str] = None
     dimensions: list[str] = Field(default_factory=list)

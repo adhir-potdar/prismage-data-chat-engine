@@ -148,6 +148,12 @@ class NLResponder:
     def _build_context_line(self, question: str, intent: ParsedIntent) -> str:
         # Suppress the original question in the prompt to prevent LLM
         # re-applying its own filter semantics from the question text.
-        if intent.applied_rules:
+        # Only suppress if rules actually enriched the intent with useful fields —
+        # a rule may fire on a generic question without adding any dimensions/metrics,
+        # in which case we still want the LLM to see the original question.
+        has_enrichment = bool(intent.applied_rules) and bool(
+            intent.metrics or intent.dimensions or intent.formula_metrics
+        )
+        if has_enrichment:
             return "Context: The following are pre-filtered sales data entries. Provide business insights and analysis."
         return f"User Question: {question}"

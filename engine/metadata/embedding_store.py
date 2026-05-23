@@ -67,9 +67,16 @@ class MetadataEmbeddingStore:
 
         self._embed_and_cache()
 
-    def find_tables(self, query: str, top_k: int = 3) -> list[str]:
+    def find_tables(self, query: str) -> list[str]:
         """
-        Return up to top_k table names ranked by cosine similarity to query.
+        Return all table names ranked by cosine similarity to query.
+        Calls build() automatically if not yet built.
+        """
+        return [t for t, _ in self.find_tables_scored(query)]
+
+    def find_tables_scored(self, query: str) -> list[tuple[str, float]]:
+        """
+        Return (table_name, score) pairs ranked by cosine similarity to query.
         Calls build() automatically if not yet built.
         """
         if not self._built:
@@ -81,7 +88,7 @@ class MetadataEmbeddingStore:
         query_vec = np.array(self._embeddings.embed_query(query), dtype=float)
         query_norm = np.linalg.norm(query_vec)
         if query_norm == 0:
-            return list(self._vectors.keys())[:top_k]
+            return [(t, 0.0) for t in self._vectors]
 
         scores: dict[str, float] = {}
         for table_name, vec in self._vectors.items():
@@ -92,7 +99,7 @@ class MetadataEmbeddingStore:
             else:
                 scores[table_name] = float(np.dot(query_vec, tv) / (query_norm * tv_norm))
 
-        return sorted(scores, key=lambda t: scores[t], reverse=True)[:top_k]
+        return sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
     def invalidate_cache(self) -> None:
         """Delete the on-disk cache, forcing a full rebuild on next build()."""

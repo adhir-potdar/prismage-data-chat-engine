@@ -45,6 +45,13 @@ class MetadataRegistry:
         d = self._dimensions.get(dimension_name)
         return d.db_column if d else None
 
+    def get_dimensions_by_hierarchy(self, hierarchy_name: str) -> list[str]:
+        """Return names of all dimensions that belong to the given hierarchy and have a real db_column."""
+        return [
+            d.name for d in self._dimensions.values()
+            if d.hierarchy_name == hierarchy_name and d.db_column
+        ]
+
     # ── Metric lookups ───────────────────────────────────────────────────────
 
     def has_metric(self, name: str) -> bool:
@@ -127,14 +134,20 @@ class MetadataRegistry:
     def render_dimensions(self) -> str:
         lines = []
         for d in self._dimensions.values():
-            aliases = ", ".join(d.aliases[:3])
-            lines.append(f"  - {d.name} (also: {aliases}) → column: {d.db_column}")
+            aliases = ", ".join(d.aliases[:5])
+            if d.db_column:
+                col_info = f"column: {d.db_column}"
+            elif d.hierarchy_name:
+                col_info = f"virtual — groups by full {d.hierarchy_name} hierarchy"
+            else:
+                col_info = "virtual"
+            lines.append(f"  - {d.name} (also: {aliases}) → {col_info}")
         return "\n".join(lines)
 
     def render_metrics(self) -> str:
         lines = []
         for m in self._metrics.values():
-            aliases = ", ".join(m.aliases[:3])
+            aliases = ", ".join(m.aliases[:5])
             lines.append(f"  - {m.name} [{m.category.value}] (also: {aliases})")
         return "\n".join(lines)
 

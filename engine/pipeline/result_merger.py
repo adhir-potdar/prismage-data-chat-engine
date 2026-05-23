@@ -1,7 +1,8 @@
 """
 ResultMerger — merges multiple QueryResult objects via full-outer join on shared
-dimension columns. Used when the same question spans multiple DB tables (e.g.
-primary and secondary channels, or sales_rep and product tables).
+dimension columns. Used when the same question spans multiple DB tables that
+share the same channel (e.g. sub-table variants for the same channel, or
+separate tables like sales_rep and product).
 
 Generic — zero domain-specific logic. Join key is determined by inspecting
 which columns appear in ALL result sets.
@@ -127,7 +128,12 @@ class ResultMerger:
             merged_rows.append(merged_row)
 
         from models.query import BuiltQuery
-        merged_query = BuiltQuery(sql="[merged]", table="merged", channel="merged")
+        # Inherit channel and label from the first result — all results in a
+        # within-channel merge share the same channel (and label when the query
+        # was produced by hierarchy expansion).
+        inherited_channel = results[0].query.channel if results else "merged"
+        inherited_label = results[0].query.label if results else None
+        merged_query = BuiltQuery(sql="[merged]", table="merged", channel=inherited_channel, label=inherited_label)
         return QueryResult(
             query=merged_query,
             columns=merged_columns,
@@ -151,7 +157,8 @@ class ResultMerger:
             all_rows.extend(r.rows)
 
         from models.query import BuiltQuery
-        merged_query = BuiltQuery(sql="[concatenated]", table="concatenated", channel="merged")
+        inherited_label = results[0].query.label if results else None
+        merged_query = BuiltQuery(sql="[concatenated]", table="concatenated", channel="merged", label=inherited_label)
         return QueryResult(
             query=merged_query,
             columns=all_cols,

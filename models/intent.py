@@ -54,6 +54,15 @@ class ParsedIntent(BaseModel):
     limit: Optional[int] = None
     confidence: float = 1.0
 
+    # Metrics as requested by the question — set before business rules run.
+    # Used to filter tabular display columns (business rules may add extra
+    # context metrics for the NL responder that should not appear in the table).
+    display_metrics: list[str] = Field(default_factory=list)
+
+    # Extracted by Question Parser — channel/variant scope from question text
+    channel_filter: Optional[str] = None   # "primary" | "secondary" | None (both channels)
+    metric_variant: Optional[str] = None   # plugin-defined variant filter, e.g. "value" | "volume" | None (all)
+
     # Enriched by Business Rules Engine
     channels: list[str] = Field(default_factory=list)
     output_hints: OutputHint = Field(default_factory=OutputHint)

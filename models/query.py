@@ -31,6 +31,8 @@ class ExecutionResult(BaseModel):
     programmatic_enumeration: Optional[str] = None
     used_fallback: bool = False
     applied_rules: list[str] = Field(default_factory=list)
+    raw_row_count: int = 0        # total rows across all queries before channel merge
+    merged_group_count: int = 0   # number of result groups after merge
 
 
 class ChatResponse(BaseModel):
@@ -46,3 +48,9 @@ class ChatResponse(BaseModel):
     total_rows: int = 0
     used_fallback: bool = False
     applied_rules: list[str] = Field(default_factory=list)
+    # Step timing and result data for verbose CLI output
+    step_timings: dict = Field(default_factory=dict)
+    raw_query_count: int = 0
+    raw_row_count: int = 0
+    merged_group_count: int = 0
+    query_results: list = Field(default_factory=list)   # [{channel, columns, rows, row_count}]

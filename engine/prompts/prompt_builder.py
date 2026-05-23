@@ -28,7 +28,8 @@ class PromptBuilder:
         self.registry = registry
         self.config = config
 
-    def build_parser_prompt(self, question: str) -> ChatPromptTemplate:
+    def build_parser_prompt(self, question: str, format_instructions: str = "") -> ChatPromptTemplate:
+        from datetime import date
         raw_system = self.library.get_system_template("question_parser")
         system = Template(raw_system).render(
             domain_context=self.config.domain_context,
@@ -37,7 +38,13 @@ class PromptBuilder:
             formulas_list=self.registry.render_formulas(),
             metric_hints=self._render_metric_hints(),
             few_shot_examples=self._render_few_shot_examples(),
+            current_date=date.today().strftime("%Y%m%d"),
         )
+        if format_instructions:
+            system = system + "\n\n## Strict Output Requirement\nYou MUST always respond with valid JSON matching the schema below, even for meta-questions. Never respond with natural language.\n" + format_instructions
+        # Escape literal braces so LangChain does not treat JSON in the
+        # rendered system prompt as Python format-string variables.
+        system = system.replace("{", "{{").replace("}", "}}")
         return ChatPromptTemplate.from_messages([
             ("system", system),
             ("human", "{question}"),
@@ -55,6 +62,7 @@ class PromptBuilder:
             data_context=data_context,
             task_description=task_description,
         )
+        system = system.replace("{", "{{").replace("}", "}}")
         return ChatPromptTemplate.from_messages([
             ("system", system),
             ("human", context_line),
@@ -73,6 +81,7 @@ class PromptBuilder:
             date_range="",
             default_limit=100,
         )
+        system = system.replace("{", "{{").replace("}", "}}")
         return ChatPromptTemplate.from_messages([
             ("system", system),
             ("human", "{question}"),
@@ -84,7 +93,14 @@ class PromptBuilder:
         lines = []
         for h in self.config.metric_hints:
             if h.maps_to_having:
-                lines.append(f'  "{h.phrase}" → having condition on {h.maps_to_having}')
+                m = h.maps_to_having
+                op = m.get("operator", "?")
+                m1 = m.get("metric1", "")
+                m2 = m.get("metric2", "")
+                lines.append(
+                    f'  "{h.phrase}" → having: metric_comparison, '
+                    f'conditions: [{{"metric1": "{m1}", "operator": "{op}", "metric2": "{m2}"}}]'
+                )
             elif h.polarity:
                 lines.append(f'  "{h.phrase}" → polarity: {h.polarity}, operator: {h.operator}')
         return "\n".join(lines)

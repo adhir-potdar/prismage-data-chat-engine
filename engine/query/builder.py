@@ -140,7 +140,7 @@ class QueryBuilder:
                 # intent.metrics by the LLM. Expand via formula_ref if available.
                 m_meta = self.registry.get_metric(m_name)
                 if m_meta and m_meta.formula_ref:
-                    expr = self.formula_engine.expand(m_meta.formula_ref, self.context)
+                    expr = self.formula_engine.expand(m_meta.formula_ref, self.context, table=table)
                     if expr:
                         parts.append(f"({expr}) AS {m_name}{suffix}")
 
@@ -152,10 +152,15 @@ class QueryBuilder:
                 # Regular metric mistakenly placed in formula_metrics by the LLM
                 # — already handled by the metrics loop above; skip silently.
                 continue
-            expr = self.formula_engine.expand(f_name, self.context)
+            expr = self.formula_engine.expand(f_name, self.context, table=table)
             if expr:
                 alias = f_name.lower().replace(" ", "_")
                 parts.append(f"({expr}) AS {alias}{suffix}")
+
+        # Always include data_as_of so the response knows the data date
+        date_col = self.registry.get_date_column(table)
+        if date_col:
+            parts.append(f"MAX({date_col}) AS data_as_of")
 
         return parts
 
@@ -227,20 +232,32 @@ class QueryBuilder:
     # ── ORDER BY ─────────────────────────────────────────────────────────────
 
     def _build_order_by(self, intent: ParsedIntent, table: str) -> str:
-        if not intent.sort:
-            return ""
-        metric = intent.sort.metric
-        # Only add ORDER BY if this table actually has the sort metric
-        if not self.registry.table_has_metric(table, metric):
-            return ""
-        col = self.registry.get_metric_column(metric)
-        agg = self.registry.get_aggregate_fn(metric)
-        if col and agg:
-            return f"ORDER BY {agg}({col}) {intent.sort.direction}"
-        # Formula / percentage metric — expand and use the expression directly
-        m = self.registry.get_metric(metric)
-        if m and m.formula_ref:
-            expr = self.formula_engine.expand(m.formula_ref, self.context)
-            if expr:
-                return f"ORDER BY ({expr}) {intent.sort.direction}"
-        return ""
+        suffix = self.capabilities.get_metric_suffix(table)
+
+        if intent.sort and intent.sort.metric:
+            metric = intent.sort.metric
+            # Only add ORDER BY if this table actually has the sort metric
+            if not self.registry.table_has_metric(table, metric):
+                return ""
+            col = self.registry.get_metric_column(metric)
+            agg = self.registry.get_aggregate_fn(metric)
+            if col and agg:
+                return f"ORDER BY {agg}({col}) {intent.sort.direction}"
+            # Formula / percentage metric — use SELECT alias
+            return f"ORDER BY {metric}{suffix} {intent.sort.direction}"
+
+        # Default: sort by all requested metrics using direction from intent.sort (if set) or DESC
+        direction = intent.sort.direction if intent.sort else "DESC"
+        order_cols = []
+        for m_name in intent.metrics:
+            if not self.registry.table_has_metric(table, m_name):
+                continue
+            col = self.registry.get_metric_column(m_name)
+            m_meta = self.registry.get_metric(m_name)
+            if col or (m_meta and m_meta.formula_ref):
+                order_cols.append(f"{m_name}{suffix} {direction}")
+        for f_name in intent.formula_metrics:
+            if not self.registry.table_has_metric(table, f_name):
+                continue
+            order_cols.append(f"{f_name}{suffix} {direction}")
+        return f"ORDER BY {', '.join(order_cols)}" if order_cols else ""

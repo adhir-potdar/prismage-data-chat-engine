@@ -41,13 +41,13 @@ class FormulaEngine:
     def __init__(self, registry: MetadataRegistry):
         self.registry = registry
 
-    def expand(self, formula_name: str, context: QueryContext | None = None) -> str | None:
+    def expand(self, formula_name: str, context: QueryContext | None = None, table: str | None = None) -> str | None:
         formula = self.registry.get_formula(formula_name)
         if not formula:
             logger.warning(f"Formula not found: {formula_name}")
             return None
 
-        substitutions = self._build_substitutions(formula, context)
+        substitutions = self._build_substitutions(formula, context, table)
         try:
             expr = formula.expression.format(**substitutions)
         except KeyError as e:
@@ -83,7 +83,7 @@ class FormulaEngine:
 
     # ── Private ──────────────────────────────────────────────────────────────
 
-    def _build_substitutions(self, formula: Formula, context: QueryContext | None) -> dict:
+    def _build_substitutions(self, formula: Formula, context: QueryContext | None, table: str | None = None) -> dict:
         subs = {}
 
         # Substitute component metric names → db_columns
@@ -92,6 +92,10 @@ class FormulaEngine:
             if col:
                 subs[col] = col       # {cymtd} → cymtd (column name as-is)
                 subs[component] = col  # {cymtd} if name differs from column
+
+        # Inject table name (used by SQL-based runtime expressions like CRR/RRR)
+        if table:
+            subs["table"] = table
 
         # Substitute runtime variables from QueryContext
         if formula.runtime_vars and context:

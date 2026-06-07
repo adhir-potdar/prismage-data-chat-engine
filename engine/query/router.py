@@ -120,6 +120,13 @@ class TableRouter:
                 if metric_sets:
                     for s in metric_sets:
                         primary_common = primary_common & s
+                # Also enforce table_affinity of dims that have no primary_tables —
+                # e.g. "category" has no primary_tables but only lives in sales_rep tables.
+                # Without this, product_name's primary_tables wins and category is silently dropped.
+                for dim in dimensions:
+                    d = self.registry.get_dimension(dim)
+                    if d and not d.primary_tables and d.table_affinity:
+                        primary_common = primary_common & set(d.table_affinity)
                 if primary_common:
                     return sorted(primary_common)
 

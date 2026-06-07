@@ -136,6 +136,28 @@ class ChatbotChain:
             execution_result.used_fallback = used_fallback
             execution_result.applied_rules = intent.applied_rules
 
+            # ── Re-sort merged results by intent.sort ─────────────────────────
+            # ResultMerger rebuilds row order alphabetically by join key, discarding
+            # the SQL ORDER BY. Re-apply the intent's sort direction here so that
+            # intent.limit slices the correct top/bottom rows.
+            if intent.sort:
+                sort_metric = intent.sort.metric
+                sort_desc = intent.sort.direction.upper() == "DESC"
+                for r in execution_result.query_results:
+                    if not (r.success and r.rows):
+                        continue
+                    # Find column: exact name or first column prefixed by metric name
+                    sort_col = sort_metric if sort_metric in r.columns else next(
+                        (c for c in r.columns if c.startswith(sort_metric + "_")), None
+                    )
+                    if sort_col:
+                        r.rows.sort(
+                            key=lambda row, sc=sort_col: (
+                                row.get(sc) is None, row.get(sc) or 0
+                            ),
+                            reverse=sort_desc,
+                        )
+
             # ── Apply intent.limit post-merge ─────────────────────────────────
             # SQL always fetches DEFAULT_LIMIT rows; trim each channel group to
             # limit after within-channel merges (value+volume → 1 group/channel).

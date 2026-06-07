@@ -3,8 +3,13 @@ Prismage Data Chat Engine — main entry point.
 Wires together all components and exposes a simple answer() interface.
 """
 from __future__ import annotations
+import argparse
 import logging
 import os
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -327,6 +332,69 @@ def _build_markdown_table(query_results: list) -> str:
     return "\n\n".join(sections)
 
 
+def _run_question(engine, question: str, include_sql: bool) -> None:
+    """Answer one question and print the result."""
+    t_start = time.time()
+    start_dt = datetime.now()
+
+    print(f"\n{_SEP}")
+    print(f"Q: {question}")
+    print(f"⏰ Started at: {start_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{_SEP}\n")
+
+    response: ChatResponse = engine.answer(question, verbose=True)
+
+    if include_sql and response.sql_queries:
+        print(f"\n{_SEP}")
+        print("SQL QUERIES")
+        print(_SEP)
+        for i, q in enumerate(response.sql_queries, 1):
+            lbl = q.get("channel") or q.get("table", f"query {i}")
+            print(f"\n-- Query {i}: {lbl}")
+            print(q.get("sql", ""))
+        print(_SEP)
+
+    t_total = time.time() - t_start
+    end_dt = datetime.now()
+
+    if not response.success:
+        print(f"\n{_SEP}")
+        print("ERROR")
+        print(_SEP)
+        print(response.error or response.answer)
+    else:
+        if response.summary:
+            print(f"\n{_SEP}")
+            print("QUICK SUMMARY")
+            print(_SEP)
+            print(response.summary)
+
+        if response.detail:
+            print(f"\n{_SEP}")
+            print("ANALYSIS (CONCISE)")
+            print(_SEP)
+            print(response.detail)
+        elif response.answer and not response.summary:
+            print(f"\n{_SEP}")
+            print("ANSWER")
+            print(_SEP)
+            print(response.answer)
+
+        if response.query_results:
+            table_str = _build_markdown_table(response.query_results)
+            if table_str:
+                print(f"\n{_SEP}")
+                print("TABULAR OUTPUT")
+                print(_SEP)
+                print(table_str)
+                print(_SEP)
+
+    print(f"\n{_SEP}")
+    print(f"⏰ Completed at: {end_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"⏱️  Total time: {t_total:.2f}s")
+    print(f"{_SEP}\n")
+
+
 def main():
     """Interactive CLI mode.
 
@@ -334,15 +402,11 @@ def main():
         python -m api.chatbot                          # generic engine (config/metadata/)
         python -m api.chatbot --plugin haldiram-sales  # named plugin
     """
-    import argparse
-    import sys
-    import time
-    from datetime import datetime
-    from pathlib import Path
 
     parser = argparse.ArgumentParser(description="Prismage Data Chat Engine — interactive CLI")
     parser.add_argument("--plugin", metavar="NAME", help="Plugin name to load (e.g. haldiram-sales)")
     parser.add_argument("--include-sql", action="store_true", help="Print the generated SQL queries for each question")
+    parser.add_argument("--question", metavar="TEXT", help="Answer a single question and exit (non-interactive mode)")
     args = parser.parse_args()
 
     if args.plugin:
@@ -372,6 +436,11 @@ def main():
         engine = build_engine()
         label = "generic"
 
+    # ── Single-question mode (--question "...") ───────────────────────────────
+    if args.question:
+        _run_question(engine, args.question.strip(), args.include_sql)
+        return
+
     print(f"Prismage Data Chat Engine [{label}] — type 'exit' to quit.\n")
 
     try:
@@ -385,70 +454,7 @@ def main():
                 break
             if not question:
                 continue
-
-            t_start = time.time()
-            start_dt = datetime.now()
-
-            # ── Header ───────────────────────────────────────────────────────
-            print(f"\n{_SEP}")
-            print(f"⏰ Started at: {start_dt.strftime('%Y-%m-%d %H:%M:%S')}")
-            print(f"{_SEP}\n")
-
-            # answer(verbose=True) prints STEP 1–4 progress to stdout as it runs
-            response: ChatResponse = engine.answer(question, verbose=True)
-
-            if args.include_sql and response.sql_queries:
-                print(f"\n{_SEP}")
-                print("SQL QUERIES")
-                print(_SEP)
-                for i, q in enumerate(response.sql_queries, 1):
-                    label = q.get("channel") or q.get("table", f"query {i}")
-                    print(f"\n-- Query {i}: {label}")
-                    print(q.get("sql", ""))
-                print(_SEP)
-
-            t_total = time.time() - t_start
-            end_dt = datetime.now()
-
-            # ── Response sections ─────────────────────────────────────────────
-            if not response.success:
-                print(f"\n{_SEP}")
-                print("ERROR")
-                print(_SEP)
-                print(response.error or response.answer)
-            else:
-                if response.summary:
-                    print(f"\n{_SEP}")
-                    print("QUICK SUMMARY")
-                    print(_SEP)
-                    print(response.summary)
-
-                if response.detail:
-                    print(f"\n{_SEP}")
-                    print("ANALYSIS (CONCISE)")
-                    print(_SEP)
-                    print(response.detail)
-                elif response.answer and not response.summary:
-                    # No structured sections — print the full answer
-                    print(f"\n{_SEP}")
-                    print("ANSWER")
-                    print(_SEP)
-                    print(response.answer)
-
-                if response.query_results:
-                    table_str = _build_markdown_table(response.query_results)
-                    if table_str:
-                        print(f"\n{_SEP}")
-                        print("TABULAR OUTPUT")
-                        print(_SEP)
-                        print(table_str)
-                        print(_SEP)
-
-            # ── Footer ────────────────────────────────────────────────────────
-            print(f"\n{_SEP}")
-            print(f"⏰ Completed at: {end_dt.strftime('%Y-%m-%d %H:%M:%S')}")
-            print(f"⏱️  Total time: {t_total:.2f}s")
-            print(f"{_SEP}\n")
+            _run_question(engine, question, args.include_sql)
 
     except KeyboardInterrupt:
         print("\nBye!")

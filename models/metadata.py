@@ -84,6 +84,7 @@ class RuleTrigger(BaseModel):
     polarity: Optional[str] = None
     formula: Optional[str] = None
     metrics: list[str] = Field(default_factory=list)
+    dimensions: list[str] = Field(default_factory=list)
     category: Optional[str] = None
     conditions: list[dict] = Field(default_factory=list)
 

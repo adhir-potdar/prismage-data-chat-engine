@@ -26,12 +26,32 @@ class BusinessRulesEngine:
 
     def enrich(self, intent: ParsedIntent, question: str) -> ParsedIntent:
         applied = []
+        sort_locked = False  # True after first set_sort rule fires; prevents later rules overriding
         for rule in self.rules:
             if self._evaluate_trigger(rule.trigger, intent, question):
                 for action in rule.actions:
+                    if action.type == "set_sort" and sort_locked:
+                        continue  # First sort rule wins — don't let a later rule override
                     self._apply_action(action, intent)
+                    if action.type == "set_sort":
+                        sort_locked = True
                 applied.append(rule.name)
                 logger.debug(f"Rule applied: {rule.name}")
+
+        # Fix misrouted metrics: LLMs sometimes place absolute/cumulative metrics
+        # in formula_metrics. Move them to metrics so they appear as standalone
+        # SELECT columns instead of being silently dropped.
+        misrouted = [
+            m for m in list(intent.formula_metrics)
+            if self.registry.get_metric_category(m) not in (
+                MetricCategory.PERCENTAGE, MetricCategory.FORMULA, None
+            )
+        ]
+        for m in misrouted:
+            intent.formula_metrics.remove(m)
+            if m not in intent.metrics:
+                intent.metrics.append(m)
+                logger.debug(f"Moved misrouted metric '{m}' from formula_metrics to metrics")
 
         intent.applied_rules = applied
         return intent
@@ -59,6 +79,9 @@ class BusinessRulesEngine:
         elif t == "metric_present":
             return any(m in intent.metrics or m in intent.formula_metrics
                        for m in trigger.metrics)
+
+        elif t == "dimension_present":
+            return any(d in intent.dimensions for d in trigger.dimensions)
 
         elif t == "metric_category":
             for m_name in intent.metrics:
@@ -148,7 +171,15 @@ class BusinessRulesEngine:
             intent.channels = action.channels
 
         elif t == "set_sort":
-            intent.sort = SortConfig(
-                metric=action.metric,
-                direction=action.direction or "DESC",
+            # Resolve sort metric: explicit action.metric wins; otherwise use the
+            # first metric already present in intent (set by LLM or earlier rules).
+            sort_metric = action.metric or next(
+                (m for m in intent.metrics if m), None
+            ) or next(
+                (m for m in intent.formula_metrics if m), None
             )
+            if sort_metric:
+                intent.sort = SortConfig(
+                    metric=sort_metric,
+                    direction=action.direction or "DESC",
+                )

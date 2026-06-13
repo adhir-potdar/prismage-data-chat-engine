@@ -20,6 +20,7 @@
 16. [Onboarding a New Domain](#onboarding-a-new-domain)
 17. [Plugin System](#plugin-system)
 18. [Engine Capabilities](#engine-capabilities)
+19. [Embedding Plugin Engine](#embedding-plugin-engine)
 
 ---
 
@@ -212,7 +213,7 @@ in JSON configuration files.
  │  │          └─► database rows                    │                     │   │
  │  │                                               │                     │   │
  │  │  Build programmatic enumeration:              │                     │   │
- │  │    "Row 1: region=North, revenue=1250000 …"   │                     │   │
+ │  │    "Row 1: dim_a=value_1, metric_a=1250 …"    │                     │   │
  │  │    (row-by-row text, prevents LLM filtering)  │                     │   │
  │  └───────────────────────┬───────────────────────┘                     │   │
  │                          │  enumeration + output_hints                 │   │
@@ -282,7 +283,7 @@ in JSON configuration files.
  │    source: hub:org/question-parser-v2                               │
  │                                                                      │
  │  Regression datasets: 112 test questions → LangSmith dataset        │
- │    langsmith evaluate --dataset "prismage-ecommerce-qa"             │
+ │    langsmith evaluate --dataset "prismage-domain-qa"             │
  └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -306,7 +307,7 @@ Converts a natural language question into a structured `ParsedIntent` using an L
 - `metrics` — canonical metric names (absolute/average/cumulative)
 - `formula_metrics` — percentage/formula metric names
 - `having` — optional `HavingConfig` (type + polarity + conditions)
-- `filters` — dimension equality filters (e.g. `{"region": "North"}`)
+- `filters` — dimension equality filters (e.g. `{"dim_name": "value_x"}`)
 - `date_range` — optional `DateRange(start, end)` in `YYYYMMDD`
 - `sort` — optional `SortConfig(metric, direction)`
 - `limit` — optional row limit
@@ -350,15 +351,15 @@ All metadata lives under `config/metadata/` (or a domain-specific override direc
 
 ### `dimensions.json`
 
-Each dimension represents a grouping column (e.g. region, product, sales rep).
+Each dimension represents a grouping column (e.g. category, location, segment).
 
 ```json
 {
-  "name": "region",
-  "aliases": ["zone", "area"],
-  "db_column": "region",
-  "table_affinity": ["orders", "invoices"],
-  "hierarchy_name": "geography",
+  "name": "dim_name",
+  "aliases": ["alias_1", "alias_2"],
+  "db_column": "dim_column",
+  "table_affinity": ["table_a", "table_b"],
+  "hierarchy_name": "hierarchy_group",
   "hierarchy_level": 1
 }
 ```
@@ -376,14 +377,14 @@ Five metric categories are supported:
 | `formula`   | (formula)   | AOV, run rate, gap-to-target |
 
 ```json
-{ "name": "revenue", "aliases": ["sales", "income"],
-  "db_column": "revenue", "aggregate_fn": "SUM",
-  "category": "absolute", "table_affinity": ["orders", "order_items"] }
+{ "name": "metric_name", "aliases": ["alias_a", "alias_b"],
+  "db_column": "metric_col", "aggregate_fn": "SUM",
+  "category": "absolute", "table_affinity": ["table_a", "table_b"] }
 
-{ "name": "profit_margin_pct", "aliases": ["profit margin", "margin %"],
+{ "name": "formula_metric", "aliases": ["alias_c", "alias_d %"],
   "db_column": null, "aggregate_fn": null,
-  "category": "percentage", "formula_ref": "profit_margin_pct",
-  "table_affinity": ["orders"] }
+  "category": "percentage", "formula_ref": "formula_metric",
+  "table_affinity": ["table_a"] }
 ```
 
 ### `formulas.json`
@@ -392,10 +393,10 @@ SQL expression templates for percentage and formula metrics.
 
 ```json
 {
-  "name": "profit_margin_pct",
-  "display": "Profit Margin %",
-  "expression": "(SUM({revenue}) - SUM({cost})) / NULLIF(SUM({revenue}), 0) * 100",
-  "components": ["revenue", "cost"],
+  "name": "formula_metric",
+  "display": "Formula Metric %",
+  "expression": "(SUM({metric_a}) - SUM({metric_b})) / NULLIF(SUM({metric_a}), 0) * 100",
+  "components": ["metric_a", "metric_b"],
   "runtime_vars": [],
   "window": false
 }
@@ -411,12 +412,12 @@ Defines database tables and which dimensions/metrics each contains.
 
 ```json
 {
-  "name": "orders",
-  "channel": "transactional",
-  "date_column": "order_date",
-  "description": "Orders fact table",
-  "dimensions": ["region", "product_name", "sales_rep"],
-  "metrics": ["revenue", "mtd_revenue", "target_revenue"]
+  "name": "fact_table",
+  "channel": "primary",
+  "date_column": "date_col",
+  "description": "Main fact table",
+  "dimensions": ["dim_a", "dim_b", "dim_c"],
+  "metrics": ["metric_name", "cumulative_metric", "target_metric"]
 }
 ```
 
@@ -519,8 +520,8 @@ into executable SQL.
 
 Example expansion:
 ```
-Template: "SUM({mtd_revenue}) / NULLIF({days_elapsed}, 0) * {total_days}"
-  → "SUM(mtd_revenue) / NULLIF(15, 0) * 31"
+Template: "SUM({metric_a}) / NULLIF({days_elapsed}, 0) * {total_days}"
+  → "SUM(metric_a_col) / NULLIF(15, 0) * 31"
 ```
 
 ---
@@ -536,7 +537,7 @@ Template: "SUM({mtd_revenue}) / NULLIF({days_elapsed}, 0) * {total_days}"
 |------|-------------|--------------|
 | `vs_average` | "above average revenue" | `HAVING SUM(revenue) > (SELECT AVG(revenue) FROM orders)` |
 | `gap_to_target` | "gap to target > 10000" | `HAVING (SUM(target) - SUM(revenue)) > 10000` |
-| `metric_comparison` | "both below target and last year" | `HAVING SUM(cymtd) < SUM(tgt) AND SUM(cymtd) < SUM(lymtd)` |
+| `metric_comparison` | "both below target and last year" | `HAVING SUM(current_metric) < SUM(target) AND SUM(current_metric) < SUM(prior_metric)` |
 
 Multi-condition patterns are joined with `AND` or `OR` as configured in
 `having_patterns[*].multi_condition_join`.
@@ -575,9 +576,9 @@ lists.
 `MetadataEmbeddingStore` (`engine/metadata/embedding_store.py`):
 - Builds one text document per table at startup:
   ```
-  Table: orders | Channel: ecommerce | Description: Orders fact table |
-  Dimensions: region(zone, area), product_name(item, sku) |
-  Metrics: revenue(sales, income), orders_count(order volume)
+  Table: fact_table | Channel: primary | Description: Main fact table |
+  Dimensions: dim_a(alias_1, alias_2), dim_b(alias_3, alias_4) |
+  Metrics: metric_a(alias_5, alias_6), metric_b(alias_7)
   ```
   Dimension and metric aliases (up to 3 per item) are included so the embedding
   captures natural language synonyms, not just canonical names.
@@ -717,12 +718,12 @@ index dictionaries.
 
 | Method | Purpose |
 |--------|---------|
-| `resolve_dimension_alias(phrase)` | "zone" → "region" |
-| `resolve_metric_alias(phrase)` | "sales" → "revenue" |
-| `get_db_column(dim_name)` | "region" → "region" (SQL column) |
-| `get_metric_column(metric_name)` | "revenue" → "revenue" |
-| `get_aggregate_fn(metric_name)` | "revenue" → "SUM" |
-| `get_metric_category(name)` | "mtd_revenue" → MetricCategory.CUMULATIVE |
+| `resolve_dimension_alias(phrase)` | "alias_1" → "dim_name" |
+| `resolve_metric_alias(phrase)` | "alias_5" → "metric_name" |
+| `get_db_column(dim_name)` | "dim_name" → "dim_column" (SQL column) |
+| `get_metric_column(metric_name)` | "metric_name" → "metric_col" |
+| `get_aggregate_fn(metric_name)` | "metric_name" → "SUM" |
+| `get_metric_category(name)` | "cumulative_metric" → MetricCategory.CUMULATIVE |
 | `table_has_dimension(table, dim)` | True if dim in table's dimension list |
 | `table_has_metric(table, metric)` | True if metric in table's metric list |
 | `register_formula(name, ...)` | Add an inline formula from a business rule |
@@ -771,9 +772,9 @@ Instead of passing raw SQL output (markdown tables, CSV) to the Stage 4 LLM, the
 builds a **programmatic enumeration** — a row-by-row text listing:
 
 ```
-Row 1: region=North, revenue=1250000, profit_margin_pct=32.4
-Row 2: region=South, revenue=980000, profit_margin_pct=28.7
-Row 3: region=East, revenue=1100000, profit_margin_pct=30.1
+Row 1: dim_a=value_1, metric_a=1250, formula_metric=32.4
+Row 2: dim_a=value_2, metric_a=980, formula_metric=28.7
+Row 3: dim_a=value_3, metric_a=1100, formula_metric=30.1
 ...
 Total rows: 3
 ```
@@ -865,7 +866,11 @@ The plugin system packages a domain config (metadata + prompts + capabilities) i
 self-contained directory that the engine loads by name. This separates domain knowledge
 from engine code and allows multiple domains to be served from one engine instance.
 
-### Plugin directory layout
+Two plugin modes are supported: **SQL** (default) for live database queries, and
+**Embedding** for pre-aggregated vector datasets. The mode is set by the `"mode"` field
+in `plugin.json` (defaults to `"sql"` when absent).
+
+### SQL plugin directory layout
 
 ```
 plugins/
@@ -881,7 +886,20 @@ plugins/
     └── tests/                 # optional test scripts
 ```
 
-**`plugin.json` fields:**
+### Embedding plugin directory layout
+
+```
+plugins/
+└── my-embedding-plugin/
+    ├── plugin.json            # manifest — name, mode: "embedding", namespace, llm_model
+    ├── config/
+    │   ├── schema.json        # dimensions, granularities, search params, metric_names
+    │   ├── prompts.json       # LLM prompt templates (question_extraction, batch_analysis, synthesis)
+    │   └── kpi_metrics.csv    # metric definitions (Metric_Name, Metric_Type, Metric_Formula)
+    └── docs/                  # optional domain documentation
+```
+
+**`plugin.json` fields — SQL mode:**
 
 | Field | Required | Description |
 |---|---|---|
@@ -893,8 +911,16 @@ plugins/
 | `capabilities` | no | Relative path to capabilities override file |
 | `docs_dir` | no | Relative path to docs directory |
 | `tests_dir` | no | Relative path to tests directory |
-| `docs` | no | Map of doc type → relative path |
-| `tests` | no | Map of test type → relative path |
+
+**`plugin.json` fields — Embedding mode:**
+
+| Field | Required | Description |
+|---|---|---|
+| `name` | yes | Plugin identifier — must match directory name |
+| `mode` | yes | Must be `"embedding"` |
+| `namespace` | yes | Vector database namespace to search |
+| `llm_model` | no | LLM model name (default: `gpt-4o-mini`) |
+| `description` | no | One-line summary |
 
 ### Loading a plugin
 
@@ -928,12 +954,22 @@ so one broken plugin does not prevent others from loading.
 
 `engine/plugins/loader.py` — `PluginLoader.load(plugin_dir)`:
 
+**SQL mode** (`"mode"` absent or `"sql"`):
+
 1. Reads `plugin.json` to resolve `config_dir` and `prompts_dir`.
 2. Calls `_load_capabilities(plugin_path)` — see [Engine Capabilities](#engine-capabilities).
 3. Delegates to `api.chatbot.build_engine(config_dir, prompts_dir, capabilities=...)`.
 4. Logs the plugin name and resolved capabilities class.
 
-No plugin-specific logic lives in the loader — all engine wiring is handled by `build_engine()`.
+**Embedding mode** (`"mode": "embedding"`):
+
+1. Reads `plugin.json` to get `namespace`, `llm_model`, and optional `enable_charts`.
+2. Reads `config/schema.json` and `config/prompts.json` from the plugin directory.
+3. Constructs and returns an `EmbeddingChain` instance — see
+   [Embedding Plugin Engine](#embedding-plugin-engine).
+
+No plugin-specific logic lives in the loader — all engine wiring is handled by `build_engine()`
+(SQL) or `EmbeddingChain.__init__()` (embedding).
 
 ### PluginRegistry
 
@@ -1047,3 +1083,165 @@ _build_where(table, intent)
 All other `QueryBuilder` logic (SELECT, GROUP BY, HAVING, ORDER BY, LIMIT) uses engine
 defaults and is not routed through capabilities. Extend `EngineCapabilities` to make
 additional clauses overridable.
+
+---
+
+## Embedding Plugin Engine
+
+The Embedding Plugin Engine is an alternative pipeline for domains where data is
+pre-aggregated and stored as vector embeddings rather than in a SQL database. It uses
+semantic similarity search across time-granularity collections, runs parallel LLM
+analysis, and synthesizes a multi-granularity answer.
+
+**When to use:** any domain where data is pre-aggregated into periodic snapshots stored
+as vector embeddings, and answers are assembled from those records rather than built
+by SQL at query time.
+
+### Components
+
+| Component | File | Role |
+|---|---|---|
+| `EmbeddingChain` | `engine/chains/embedding_chain.py` | Top-level `.answer()` interface — wires all components |
+| `QuestionParser` | `engine/embedding/question_parser.py` | Extracts metrics, dimensions, granularities, date range from question |
+| `CollectionFinder` | `engine/embedding/collection_finder.py` | Selects vector collections by dimension + granularity + date range |
+| `Searcher` | `engine/embedding/searcher.py` | Parallel vector similarity search across collections |
+| `Analyzer` | `engine/embedding/analyzer.py` | Batch LLM analysis of search results per granularity |
+| `Synthesizer` | `engine/embedding/synthesizer.py` | Per-granularity batch merging + final collective synthesis |
+| `Orchestrator` | `engine/embedding/orchestrator.py` | 3-phase pipeline: search → analyze → synthesize |
+| `date_utils` | `engine/embedding/date_utils.py` | Date parsing, collection name date extraction |
+
+### Pipeline
+
+```
+USER QUESTION
+     │
+     ▼
+┌────────────────────────────────────────────────────────────────┐
+│  EmbeddingChain.answer()                                       │
+│                                                                │
+│  Step 1 — QuestionParser.parse()                  [LLM]       │
+│    Extract: metrics, dimensions, granularities,               │
+│             date range (raw text + YYYYMMDD bounds)           │
+│                                                                │
+│  Step 2 — QuestionParser.validate()               [Pure Python]│
+│    Normalize metric names against kpi_metrics.csv             │
+│    Reject if no valid metrics found                           │
+│                                                                │
+│  Step 3 — CollectionFinder                        [Pure Python]│
+│    Select dimension (with fallback hierarchy)                 │
+│    find_fast() — metadata service query                       │
+│      OR find_slow() — scan pipeline collections              │
+│    Filter by granularity + date range overlap                 │
+│    → collections_by_granularity { gran: [coll, ...] }        │
+│                                                                │
+│  Step 4 — Orchestrator.run()                      [Async]     │
+│    Phase 1: Parallel vector search across all granularities   │
+│    Phase 2: Global top-K with granularity distribution        │
+│    Phase 3: Batch analysis → collective synthesis             │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+  ChatResponse(.answer, .summary, .detail)
+```
+
+### Orchestrator — 3-phase algorithm
+
+**Phase 1 — Parallel search**
+
+`Searcher.search_granularity()` runs concurrently for every granularity in
+`collections_by_granularity`. Each call performs a vector similarity search against its
+collections and returns `SearchResult(granularity, results=[(record, similarity), ...])`.
+
+**Phase 2 — Global top-K with granularity distribution**
+
+`_distribute_top_k()` selects the best `top_k_global` records distributed across
+granularities:
+
+1. Rank granularities by `(-result_count, -max_similarity, name_ASC)` — the alphabetical
+   tie-breaker ensures deterministic output when multiple granularities have equal scores.
+2. Guarantee at least one result from each of the top `max_granularities_for_top_results`
+   granularities.
+3. Fill remaining quota in priority order, deduplicating by `chunk_id`.
+
+**Phase 3 — Analysis and synthesis**
+
+In hybrid mode (default): split each granularity's results into batches of
+`max_results_per_batch`, analyze all batches in parallel via `Analyzer.analyze_batch()`
+(LLM call per batch), then combine batch insights per granularity.
+
+In standard mode: analyze all results for each granularity together in one LLM call.
+
+`Synthesizer.synthesize_collective()` combines all granularity insights into one
+comprehensive answer with a structured header showing dimension, granularities analyzed,
+and data period.
+
+### `schema.json` — configuration reference
+
+```json
+{
+  "dimensions": {
+    "hierarchy": ["dim_a", "dim_b", "overall"],
+    "fallback": {"dim_a": "overall"},
+    "known_values": {"dim_b": ["VALUE_1", "VALUE_2"]}
+  },
+  "time_granularities": ["gran_a", "gran_b", "gran_c"],
+  "granularity_names": {
+    "gran_a": "Granularity A Label",
+    "gran_b": "Granularity B Label",
+    "gran_c": "Granularity C Label"
+  },
+  "search": {
+    "top_k_global": 5,
+    "max_granularities_for_top_results": 3,
+    "max_results_per_batch": 2,
+    "similarity_threshold": 0.2,
+    "max_results_per_collection": 5,
+    "enable_hybrid_parallelization": true,
+    "enable_per_granularity_synthesis": false
+  },
+  "metrics_file": "config/kpi_metrics.csv"
+}
+```
+
+| Key | Description |
+|---|---|
+| `dimensions.hierarchy` | Dimension resolution order — first available dimension wins |
+| `dimensions.fallback` | Maps a dimension to its fallback when unavailable |
+| `dimensions.known_values` | Allowed values per dimension for filtering |
+| `time_granularities` | Ordered list of granularities to search (controls priority) |
+| `granularity_names` | Human-readable labels used in output headers |
+| `search.top_k_global` | Total result records selected across all granularities |
+| `search.max_granularities_for_top_results` | Max granularities guaranteed a slot in top-K |
+| `search.max_results_per_batch` | Records per LLM analysis batch |
+| `search.similarity_threshold` | Minimum cosine similarity to include a result |
+| `search.enable_hybrid_parallelization` | Batch analysis in parallel (default `true`) |
+| `search.enable_per_granularity_synthesis` | Extra LLM call to merge batches per granularity |
+
+### Data period display
+
+The output header always includes a data period line derived from the collection names
+actually used in the search. Collection names encode their date range in the format:
+`{dim}_{gran}_{p1_start}_{p1_end}_vs_{p2_start}_{p2_end}_date_{date}`.
+
+`date_utils.extract_dates_from_collection_name()` parses this pattern. The synthesizer
+computes `min(all_period_starts)` to `max(all_period_ends)` across all filtered collections.
+
+When the question specifies a date range, both the requested and actual data periods
+are shown:
+
+```
+📅 Requested: <user date text> | Actual Data: <collection start> to <collection end>
+```
+
+When no date range is specified:
+
+```
+📅 Data Period: <collection start> to <collection end>
+```
+
+### Output format
+
+`EmbeddingChain._split_answer()` splits the LLM output into `summary` (first paragraph)
+and `detail` (remainder). `ChatResponse.summary` holds the quick answer; `ChatResponse.detail`
+holds the full structured analysis with header and per-granularity sections.

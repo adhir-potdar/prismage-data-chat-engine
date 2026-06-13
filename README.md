@@ -36,6 +36,12 @@ User: "Which regions are both below target and below last year MTD?"
   `build_plugin_engine("my-plugin")` or load all plugins at once with `build_multi_engine()`.
 - **Engine capability overrides** — plugins can subclass `EngineCapabilities` to change
   how specific SQL clauses are built (e.g. snapshot date filter) without touching engine code.
+- **Embedding plugin mode** — alternative to SQL for pre-aggregated vector datasets. Set
+  `"mode": "embedding"` in `plugin.json` to activate. Uses OpenAI vector embeddings to search
+  across time-granularity collections (DOD, WTD, MTD, QTD, MOM, QOQ), runs parallel batch LLM
+  analysis, and synthesizes a multi-granularity answer with data period display. Supports
+  dimension hierarchies, date range filtering from natural language, and deterministic
+  result selection.
 
 ## Quick Start
 
@@ -99,10 +105,19 @@ prismage-data-chat-engine/
 │   ├── capabilities/
 │   │   └── base.py                # EngineCapabilities — overridable SQL-building behaviours
 │   ├── plugins/
-│   │   ├── loader.py              # PluginLoader — loads plugin directory into ChatbotChain
+│   │   ├── loader.py              # PluginLoader — loads SQL or embedding plugin into chain
 │   │   └── registry.py            # PluginRegistry — multi-plugin dispatch
-│   └── chains/
-│       └── chatbot_chain.py       # ChatbotChain — orchestrates all stages + fallback
+│   ├── chains/
+│   │   ├── chatbot_chain.py       # ChatbotChain — SQL pipeline (parse → SQL → NL answer)
+│   │   └── embedding_chain.py     # EmbeddingChain — vector search pipeline (parse → search → synthesize)
+│   └── embedding/
+│       ├── question_parser.py     # Extracts metrics, dimensions, date range from question
+│       ├── collection_finder.py   # Finds matching vector collections by dimension + granularity + date
+│       ├── searcher.py            # Parallel vector similarity search across collections
+│       ├── analyzer.py            # Batch LLM analysis of search results per granularity
+│       ├── synthesizer.py         # Multi-granularity synthesis into final answer
+│       ├── orchestrator.py        # 3-phase pipeline: search → analyze → synthesize
+│       └── date_utils.py          # Date parsing, collection name date extraction
 │
 ├── adapters/
 │   ├── database.py                # create_database() → SQLDatabase wrapper
@@ -142,17 +157,22 @@ prismage-data-chat-engine/
 The recommended way to onboard a new domain is to create a plugin — a self-contained
 directory under `plugins/` that bundles metadata, prompts, and optional capability overrides.
 
+Two plugin modes are supported: **SQL** (default) for live database queries, and **Embedding**
+for pre-aggregated vector datasets.
+
+### SQL Plugin
+
 ```bash
 # 1. Copy the starter template
 cp -r plugins/empty-plugin plugins/my-plugin
 
-# 2. Edit plugin.json — set name and description
+# 2. Edit plugin.json — set name and description (mode defaults to "sql")
 # 3. Fill in config/metadata/ JSON files (dimensions, metrics, formulas, tables, rules)
 # 4. Tune config/prompts/ templates
 # 5. (Optional) override SQL behaviours in capabilities.py
 ```
 
-**Load a single plugin:**
+**Load and query:**
 
 ```python
 from api.chatbot import build_plugin_engine
@@ -163,16 +183,47 @@ print(response.summary)
 print(response.detail)
 ```
 
-**Load all plugins at once:**
+### Embedding Plugin
+
+For domains where data is pre-aggregated and stored as vector embeddings:
+
+**`plugin.json`:**
+```json
+{
+  "name": "my-embedding-plugin",
+  "mode": "embedding",
+  "namespace": "my_namespace",
+  "llm_model": "gpt-4o-mini"
+}
+```
+
+**`config/schema.json`** — defines dimensions, granularities, and search parameters.
+See [DESIGN.md](docs/DESIGN.md) → Embedding Plugin Engine for the full schema reference.
+
+**`config/prompts.json`** — LLM prompt templates for question extraction, batch analysis,
+and multi-granularity synthesis.
+
+**Load and query:**
+
+```python
+from api.chatbot import build_plugin_engine
+
+engine = build_plugin_engine("my-embedding-plugin")
+response = engine.answer("Ask a question about your domain")
+print(response.summary)
+print(response.detail)
+```
+
+### Load all plugins at once
 
 ```python
 from api.chatbot import build_multi_engine
 
-registry = build_multi_engine()                            # auto-discovers all plugins/
+registry = build_multi_engine()   # auto-discovers all plugins/ (both SQL and embedding)
 response = registry.answer("my-plugin", "Top 5 products by revenue")
 ```
 
-**Use without the plugin system** (direct config directory):
+### Use without the plugin system (SQL only)
 
 ```python
 from api.chatbot import build_engine
@@ -196,11 +247,17 @@ engine behaviours.
 # Generic engine (uses config/metadata/)
 python -m api.chatbot
 
-# Named plugin
-python -m api.chatbot --plugin haldiram-sales
+# Named SQL plugin
+python -m api.chatbot --plugin my-sql-plugin
 
-# Named plugin — also print the generated SQL for every question
-python -m api.chatbot --plugin haldiram-sales --include-sql
+# Named SQL plugin — also print the generated SQL for every question
+python -m api.chatbot --plugin my-sql-plugin --include-sql
+
+# Named embedding plugin — interactive session
+python -m api.chatbot --plugin my-embedding-plugin
+
+# Named embedding plugin — single question (non-interactive)
+python -m api.chatbot --plugin my-embedding-plugin --question "Which items are below threshold?"
 ```
 
 **CLI flags:**
@@ -208,9 +265,12 @@ python -m api.chatbot --plugin haldiram-sales --include-sql
 | Flag | Description |
 |---|---|
 | `--plugin NAME` | Load a named plugin from `plugins/<NAME>/` |
-| `--include-sql` | Print the SQL query (or queries) generated for each question |
+| `--include-sql` | Print the SQL query (or queries) generated for each question (SQL plugins only) |
+| `--question TEXT` | Run a single question and exit (embedding plugins) |
 
 When `--include-sql` is set, a **SQL QUERIES** block is printed after each response showing the exact SQL sent to the database, labelled by channel (primary / secondary). Useful for debugging parser output and verifying HAVING, GROUP BY, and WHERE clauses.
+
+For embedding plugins, the output includes a **QUICK SUMMARY** (direct answer) and an **ANALYSIS (CONCISE)** section with per-granularity metric breakdowns, dimension values, period-over-period changes, and a data period indicator showing what date range was used.
 
 ## Running Tests
 

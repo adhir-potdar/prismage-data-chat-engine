@@ -1,0 +1,51 @@
+{
+  "description": "Configuration for analytics and business intelligence data",
+  "version": "1.0",
+  "extends": "default.json",
+  "domain_patterns": {
+    "analytics": ["metric", "kpi", "analysis", "dashboard", "report", "insight"],
+    "performance": ["performance", "trend", "benchmark", "target", "goal"],
+    "measurement": ["measure", "measurement", "indicator", "score", "rating"],
+    "temporal_analysis": ["period", "interval", "timeline", "historical", "forecast"],
+    "business_metrics": ["revenue", "profit", "growth", "efficiency", "productivity"]
+  },
+  "metric_patterns": {
+    "percentage_change": "change_percentage|percent_change|%_change|pct_change",
+    "absolute_change": "change_absolute|absolute_change|delta|difference",
+    "growth_metrics": "growth|increase|decrease|improvement|decline",
+    "ratios": "ratio|rate|proportion|percentage|share",
+    "aggregations": "sum|total|average|mean|median|min|max|count",
+    "performance_indicators": "performance|efficiency|effectiveness|productivity"
+  },
+  "entity_indicators": {
+    "metrics": ["metric", "kpi", "measure", "indicator", "score"],
+    "dimensions": ["dimension", "category", "segment", "group"],
+    "time_periods": ["period", "date", "time", "timestamp", "interval"],
+    "business_units": ["department", "division", "team", "unit", "region"],
+    "data_quality": ["quality", "confidence", "accuracy", "completeness"]
+  },
+  "content_type_patterns": {
+    "metrics": ["\\d+\\.?\\d*%", "\\$\\d+", "metric|kpi|score"],
+    "comparisons": ["vs|versus|compared_to|baseline|target"],
+    "trends": ["trending|increasing|decreasing|stable|volatile"],
+    "analysis": ["analysis|insight|finding|conclusion|recommendation"]
+  },
+  "performance_keywords": [
+    "performance", "optimization", "efficiency", "effectiveness",
+    "improvement", "enhancement", "growth", "success", "achievement",
+    "target", "goal", "objective", "benchmark", "standard"
+  ],
+  "reasoning_keywords": [
+    "analysis", "insight", "finding", "conclusion", "recommendation",
+    "explanation", "interpretation", "summary", "assessment",
+    "driven_by", "due_to", "caused_by", "resulted_from", "attributed_to"
+  ],
+  "metadata_keywords": [
+    "analysis_metadata", "calculation_metadata", "data_quality",
+    "confidence_level", "methodology", "assumptions", "limitations"
+  ],
+  "business_context_indicators": [
+    "contributing_factors", "root_cause", "impact", "implication",
+    "recommendation", "action_item", "next_steps", "follow_up"
+  ]
+}

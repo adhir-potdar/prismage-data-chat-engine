@@ -1,0 +1,34 @@
+2026-06-10 10:52:46,212 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:52:46,318 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact.json
+2026-06-10 10:52:46,318 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact.json
+2026-06-10 10:52:46,318 - INFO - File size: 3.07 KB
+2026-06-10 10:52:46,318 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:52:46,336 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact'
+2026-06-10 10:52:46,337 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:46,337 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:46,337 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:46,337 - INFO - Processing document: reasoning_campaign_mgmt_overall_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:46,337 - INFO - Starting strategy decision process
+2026-06-10 10:52:46,338 - INFO - Selected strategy: hierarchical with confidence: 0.73
+2026-06-10 10:52:46,338 - INFO - Document processed successfully: 4 chunks created using hierarchical strategy
+2026-06-10 10:52:46,338 - INFO - Selected strategy: hierarchical (confidence: 0.73)
+2026-06-10 10:52:46,338 - WARNING - ✗ Failed to extract dimension_value from path='dimension_analyses'
+2026-06-10 10:52:46,338 - INFO - Generated 4 high-quality embedding chunks
+2026-06-10 10:52:46,338 - INFO - Document chunking complete: Generated 4 chunks
+2026-06-10 10:52:46,339 - INFO - Vector Generation: Generating embeddings for 4 chunks
+2026-06-10 10:52:46,339 - INFO - Using traditional storage for small chunk set
+2026-06-10 10:52:46,339 - INFO - Generating embeddings for 4 chunks
+2026-06-10 10:52:46,346 - INFO - Processing 4 texts in 1 token-aware batches
+2026-06-10 10:52:46,982 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:52:46,989 - INFO - Successfully generated 4 embeddings
+2026-06-10 10:52:46,990 - INFO - Successfully generated 4 vector embeddings
+2026-06-10 10:52:46,990 - INFO - Vector Generation: Generated 4 vector embeddings
+2026-06-10 10:52:46,990 - INFO - Vector Storage: Storing embeddings in PGVector database
+2026-06-10 10:52:47,036 - INFO - Inserted 4 embeddings into database
+2026-06-10 10:52:47,036 - INFO - Vector storage complete: Stored 4 embeddings in database
+2026-06-10 10:52:47,037 - INFO - ✓ JSON processing successful!
+2026-06-10 10:52:47,037 - INFO - ✓ Total Chunks: 4
+2026-06-10 10:52:47,037 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-10 10:52:47,037 - INFO - ✓ API Tokens Used: 2334
+2026-06-10 10:52:47,038 - INFO - Database connections closed
+2026-06-10 10:52:47,038 - INFO - Pipeline connections closed

@@ -1,0 +1,45 @@
+{
+  "description": "Default minimal configuration for generic JSON analysis",
+  "version": "1.0",
+  "domain_patterns": {
+    "general": ["data", "info", "content", "object", "item", "record"],
+    "structure": ["list", "array", "collection", "group", "set"]
+  },
+  "metric_patterns": {
+    "numeric": "\\d+\\.?\\d*",
+    "percentage": "percent|%|ratio",
+    "count": "count|total|sum|quantity",
+    "comparison": "vs|versus|compare|before|after"
+  },
+  "entity_indicators": {
+    "identifiers": ["id", "key", "uuid", "guid"],
+    "names": ["name", "title", "label"],
+    "values": ["value", "amount", "data"],
+    "descriptions": ["description", "summary", "detail"],
+    "types": ["type", "category", "kind", "class"]
+  },
+  "content_type_patterns": {
+    "temporal": ["\\d{4}-\\d{2}-\\d{2}", "\\d{2}/\\d{2}/\\d{4}", "time", "date", "timestamp"],
+    "numerical": ["\\d+\\.?\\d*", "number", "numeric", "count"],
+    "text": ["description", "comment", "note", "text"],
+    "metadata": ["meta", "info", "header", "config"],
+    "boolean": ["true", "false", "enabled", "disabled"]
+  },
+  "performance_keywords": [
+    "performance", "metric", "measure", "score", "rate"
+  ],
+  "reasoning_keywords": [
+    "reason", "because", "note", "comment", "description"
+  ],
+  "metadata_keywords": [
+    "meta", "metadata", "config", "configuration", "info",
+    "information", "header", "properties", "attributes"
+  ],
+  "entity_collection_keys": [
+    "data", "items", "records", "objects", "content", "list"
+  ],
+  "technical_keys": [
+    "id", "type", "timestamp", "version", "status", "index",
+    "created", "updated", "modified", "hash"
+  ]
+}

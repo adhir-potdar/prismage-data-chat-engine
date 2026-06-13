@@ -1,0 +1,351 @@
+2026-06-10 10:40:54,261 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:40:54,356 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact.json
+2026-06-10 10:40:54,371 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact.json
+2026-06-10 10:40:54,371 - INFO - File size: 4119.04 KB
+2026-06-10 10:40:54,371 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:40:54,535 - INFO - Deleted 1199 embeddings for document 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact'
+2026-06-10 10:40:54,538 - INFO - 🔄 Replaced existing document: deleted 1199 embeddings for 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact' from all collections
+2026-06-10 10:40:54,538 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:40:54,538 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:40:54,538 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:40:54,538 - INFO - Processing document: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:40:54,538 - INFO - Starting strategy decision process
+2026-06-10 10:40:55,136 - INFO - Selected strategy: hierarchical with confidence: 0.82
+2026-06-10 10:40:55,408 - INFO - Document processed successfully: 1743 chunks created using hierarchical strategy
+2026-06-10 10:40:55,408 - INFO - Selected strategy: hierarchical (confidence: 0.82)
+2026-06-10 10:40:55,459 - INFO - Generated 1743 high-quality embedding chunks
+2026-06-10 10:40:55,459 - INFO - Document chunking complete: Generated 1743 chunks
+2026-06-10 10:40:55,459 - INFO - Vector Generation: Generating embeddings for 1743 chunks
+2026-06-10 10:40:55,459 - INFO - Using streaming storage for large chunk set
+2026-06-10 10:40:55,459 - INFO - Streaming embeddings for 1743 chunks with buffer size 100
+2026-06-10 10:40:55,459 - INFO - Processing batch 1: 100 chunks (total progress: 100/1743)
+2026-06-10 10:40:55,476 - WARNING - Skipping chunk reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1_hier_1_analysis_metadata: 45808 tokens exceeds limit of 7600
+2026-06-10 10:40:55,512 - INFO - Processing 99 texts in 7 token-aware batches
+2026-06-10 10:40:55,512 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:40:56,282 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:40:56,505 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:40:56,850 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:40:57,063 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:40:58,392 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:40:59,263 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:40:59,618 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:40:59,823 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:00,176 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:00,392 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:00,392 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/7 to prevent rate limits
+2026-06-10 10:41:02,646 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:02,865 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:03,185 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:03,187 - INFO - Successfully generated 2 embeddings
+2026-06-10 10:41:03,430 - INFO - Inserted 99 embeddings into database
+2026-06-10 10:41:03,431 - INFO - Batch 1 complete: 99 embeddings stored (total: 99/1743)
+2026-06-10 10:41:03,432 - INFO - Processing batch 2: 100 chunks (total progress: 200/1743)
+2026-06-10 10:41:03,470 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:03,470 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:03,894 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:04,011 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:04,251 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:04,477 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:04,738 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:04,749 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:05,024 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:05,034 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:05,383 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:05,601 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:05,602 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:07,859 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:08,086 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:08,291 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:08,291 - INFO - Batch 2 complete: 100 embeddings stored (total: 199/1743)
+2026-06-10 10:41:08,292 - INFO - Processing batch 3: 100 chunks (total progress: 300/1743)
+2026-06-10 10:41:08,329 - INFO - Processing 100 texts in 7 token-aware batches
+2026-06-10 10:41:08,329 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:08,665 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:08,883 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:09,251 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:09,465 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:09,811 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:10,027 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:10,299 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:10,387 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:10,633 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:10,745 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:10,746 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/7 to prevent rate limits
+2026-06-10 10:41:14,656 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:16,133 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:16,356 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:16,357 - INFO - Successfully generated 1 embeddings
+2026-06-10 10:41:16,579 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:16,580 - INFO - Batch 3 complete: 100 embeddings stored (total: 299/1743)
+2026-06-10 10:41:16,581 - INFO - Processing batch 4: 100 chunks (total progress: 400/1743)
+2026-06-10 10:41:16,617 - INFO - Processing 100 texts in 7 token-aware batches
+2026-06-10 10:41:16,617 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:16,988 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:17,104 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:17,450 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:17,666 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:17,904 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:18,032 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:18,278 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:18,407 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:18,686 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:18,698 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:18,698 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/7 to prevent rate limits
+2026-06-10 10:41:20,999 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:21,214 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:21,434 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:21,436 - INFO - Successfully generated 1 embeddings
+2026-06-10 10:41:21,656 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:21,657 - INFO - Batch 4 complete: 100 embeddings stored (total: 399/1743)
+2026-06-10 10:41:21,658 - INFO - Processing batch 5: 100 chunks (total progress: 500/1743)
+2026-06-10 10:41:21,694 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:21,694 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:21,926 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:22,081 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:22,355 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:22,629 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:22,915 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:23,057 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:41:23,341 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:23,430 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:23,796 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:24,027 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:24,028 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:26,617 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:26,700 - INFO - Successfully generated 14 embeddings
+2026-06-10 10:41:26,925 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:26,926 - INFO - Batch 5 complete: 100 embeddings stored (total: 499/1743)
+2026-06-10 10:41:26,927 - INFO - Processing batch 6: 100 chunks (total progress: 600/1743)
+2026-06-10 10:41:26,962 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:26,962 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:27,200 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:27,340 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:28,458 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:29,439 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:29,798 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:29,994 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:30,346 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:30,589 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:41:30,827 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:31,090 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:31,090 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:33,352 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:33,488 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:41:33,710 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:33,711 - INFO - Batch 6 complete: 100 embeddings stored (total: 599/1743)
+2026-06-10 10:41:33,711 - INFO - Processing batch 7: 100 chunks (total progress: 700/1743)
+2026-06-10 10:41:33,747 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:33,747 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:34,645 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:34,727 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:41:35,038 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:35,270 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:35,513 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:35,854 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:36,140 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:36,206 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:36,482 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:36,633 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:41:36,633 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:39,610 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:40,327 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:41:40,549 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:40,549 - INFO - Batch 7 complete: 100 embeddings stored (total: 699/1743)
+2026-06-10 10:41:40,550 - INFO - Processing batch 8: 100 chunks (total progress: 800/1743)
+2026-06-10 10:41:40,586 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:40,586 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:40,872 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:40,931 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:41,169 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:41,389 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:42,072 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:42,197 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:42,486 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:42,545 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:42,845 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:42,898 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:42,898 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:45,252 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:45,376 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:41:45,580 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:45,581 - INFO - Batch 8 complete: 100 embeddings stored (total: 799/1743)
+2026-06-10 10:41:45,581 - INFO - Processing batch 9: 100 chunks (total progress: 900/1743)
+2026-06-10 10:41:45,616 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:45,616 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:45,870 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:46,112 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:47,151 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:47,684 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:47,957 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:48,291 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:48,551 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:48,801 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:50,381 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:50,484 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:50,484 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:52,908 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:53,197 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:41:53,409 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:53,409 - INFO - Batch 9 complete: 100 embeddings stored (total: 899/1743)
+2026-06-10 10:41:53,410 - INFO - Processing batch 10: 100 chunks (total progress: 1000/1743)
+2026-06-10 10:41:53,446 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:53,446 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:53,691 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:54,010 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:54,426 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:54,615 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:54,985 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:55,200 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:55,444 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:55,812 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:56,101 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:56,174 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:56,174 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:41:58,536 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:58,749 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:41:58,995 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:41:58,996 - INFO - Batch 10 complete: 100 embeddings stored (total: 999/1743)
+2026-06-10 10:41:58,997 - INFO - Processing batch 11: 100 chunks (total progress: 1100/1743)
+2026-06-10 10:41:59,033 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:41:59,033 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:41:59,268 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:41:59,547 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:41:59,788 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:00,119 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:00,414 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:00,667 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:01,150 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:01,219 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:01,612 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:01,803 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:01,803 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:04,288 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:04,376 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:42:04,658 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:04,659 - INFO - Batch 11 complete: 100 embeddings stored (total: 1099/1743)
+2026-06-10 10:42:04,660 - INFO - Processing batch 12: 100 chunks (total progress: 1200/1743)
+2026-06-10 10:42:04,728 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:42:04,728 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:42:05,074 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:05,307 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:05,571 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:05,686 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:06,063 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:06,295 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:06,621 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:06,715 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:07,006 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:07,057 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:07,057 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:09,394 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:09,547 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:42:09,748 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:09,749 - INFO - Batch 12 complete: 100 embeddings stored (total: 1199/1743)
+2026-06-10 10:42:09,749 - INFO - Processing batch 13: 100 chunks (total progress: 1300/1743)
+2026-06-10 10:42:09,786 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:42:09,786 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:42:10,041 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:10,156 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:42:10,403 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:10,613 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:11,190 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:11,491 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:12,055 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:12,285 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:12,861 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:13,089 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:13,089 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:15,621 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:15,692 - INFO - Successfully generated 14 embeddings
+2026-06-10 10:42:15,924 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:15,925 - INFO - Batch 13 complete: 100 embeddings stored (total: 1299/1743)
+2026-06-10 10:42:15,926 - INFO - Processing batch 14: 100 chunks (total progress: 1400/1743)
+2026-06-10 10:42:15,962 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:42:15,962 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:42:16,317 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:16,552 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:16,915 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:17,148 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:17,665 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:17,929 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:18,434 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:18,725 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:19,309 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:19,533 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:19,533 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:21,891 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:22,111 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:42:22,356 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:22,357 - INFO - Batch 14 complete: 100 embeddings stored (total: 1399/1743)
+2026-06-10 10:42:22,357 - INFO - Processing batch 15: 100 chunks (total progress: 1500/1743)
+2026-06-10 10:42:22,395 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:42:22,395 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:42:22,757 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:22,986 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:23,357 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:23,598 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:23,857 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:24,207 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:24,612 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:24,807 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:25,165 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:25,398 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:25,398 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:28,071 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:30,052 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:42:30,289 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:30,290 - INFO - Batch 15 complete: 100 embeddings stored (total: 1499/1743)
+2026-06-10 10:42:30,290 - INFO - Processing batch 16: 100 chunks (total progress: 1600/1743)
+2026-06-10 10:42:30,326 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:42:30,326 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:42:30,826 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:31,188 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:31,613 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:31,888 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:32,307 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:32,516 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:32,908 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:33,155 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:33,617 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:33,774 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:33,774 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:36,024 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:36,306 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:42:36,543 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:36,543 - INFO - Batch 16 complete: 100 embeddings stored (total: 1599/1743)
+2026-06-10 10:42:36,544 - INFO - Processing batch 17: 100 chunks (total progress: 1700/1743)
+2026-06-10 10:42:36,579 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:42:36,579 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:42:37,222 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:37,303 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:38,083 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:38,311 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:38,671 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:38,910 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:39,617 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:39,689 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:40,308 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:40,405 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:42:40,405 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:42:42,654 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:42,993 - INFO - Successfully generated 14 embeddings
+2026-06-10 10:42:43,238 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:42:43,239 - INFO - Batch 17 complete: 100 embeddings stored (total: 1699/1743)
+2026-06-10 10:42:43,240 - INFO - Processing batch 18: 43 chunks (total progress: 1743/1743)
+2026-06-10 10:42:43,254 - INFO - Processing 43 texts in 3 token-aware batches
+2026-06-10 10:42:43,606 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:43,847 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:44,117 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:44,322 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:42:44,708 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:42:44,798 - INFO - Successfully generated 9 embeddings
+2026-06-10 10:42:44,937 - INFO - Inserted 43 embeddings into database
+2026-06-10 10:42:44,938 - INFO - Batch 18 complete: 43 embeddings stored (total: 1742/1743)
+2026-06-10 10:42:44,938 - INFO - Streaming complete: 1742 embeddings processed and stored in 18 batches
+2026-06-10 10:42:44,939 - INFO - Streaming storage complete: Processed 1742 embeddings in 18 batches
+2026-06-10 10:42:44,941 - INFO - ✓ JSON processing successful!
+2026-06-10 10:42:44,941 - INFO - ✓ Total Chunks: 1743
+2026-06-10 10:42:44,941 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-10 10:42:44,941 - INFO - ✓ API Tokens Used: 805907
+2026-06-10 10:42:44,945 - INFO - Database connections closed
+2026-06-10 10:42:44,945 - INFO - Pipeline connections closed

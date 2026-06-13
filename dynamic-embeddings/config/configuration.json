@@ -1,0 +1,59 @@
+{
+  "description": "Configuration for application and system configuration files",
+  "version": "1.0",
+  "extends": "default.json",
+  "domain_patterns": {
+    "configuration": ["config", "configuration", "settings", "preferences"],
+    "system": ["system", "application", "service", "component"],
+    "environment": ["environment", "env", "deployment", "stage"],
+    "security": ["security", "auth", "authentication", "authorization"],
+    "network": ["network", "endpoint", "url", "host", "port"],
+    "database": ["database", "db", "connection", "datasource"],
+    "logging": ["logging", "log", "audit", "monitoring"],
+    "features": ["feature", "toggle", "flag", "switch", "enable"]
+  },
+  "metric_patterns": {
+    "timeouts": "timeout|duration|delay|interval",
+    "limits": "limit|max|maximum|threshold|capacity",
+    "counts": "count|size|length|number",
+    "boolean_settings": "enabled|disabled|active|inactive|on|off"
+  },
+  "entity_indicators": {
+    "settings": ["setting", "option", "parameter", "property", "variable"],
+    "services": ["service", "api", "endpoint", "component", "module"],
+    "resources": ["resource", "pool", "cache", "buffer", "queue"],
+    "security": ["key", "token", "certificate", "credential", "secret"],
+    "connections": ["connection", "url", "endpoint", "host", "port"]
+  },
+  "content_type_patterns": {
+    "urls": ["https?://", "ftp://", "jdbc:", "mongodb://"],
+    "file_paths": ["/", "\\\\", "C:", "~", "./", "../"],
+    "environment_vars": ["\\$\\{[^}]+\\}", "\\$[A-Z_]+", "%[A-Z_]+%"],
+    "version_numbers": ["\\d+\\.\\d+(\\.\\d+)?", "v\\d+"],
+    "boolean_values": ["true|false|yes|no|on|off|enabled|disabled"],
+    "time_values": ["\\d+[smhd]", "\\d+ms", "\\d+ seconds"]
+  },
+  "performance_keywords": [
+    "performance", "optimization", "tuning", "efficiency",
+    "throughput", "latency", "response_time", "cache"
+  ],
+  "reasoning_keywords": [
+    "default", "recommended", "optional", "required", "deprecated",
+    "legacy", "temporary", "experimental", "stable", "beta"
+  ],
+  "metadata_keywords": [
+    "version", "description", "author", "created", "modified",
+    "environment", "profile", "schema", "format"
+  ],
+  "configuration_sections": [
+    "server", "database", "logging", "security", "cache",
+    "monitoring", "features", "integration", "external"
+  ],
+  "technical_patterns": {
+    "connection_strings": "connection|datasource|url|endpoint",
+    "credentials": "username|password|key|token|secret",
+    "timeouts": "timeout|duration|delay|wait",
+    "pools": "pool|connection|thread|worker",
+    "limits": "limit|max|threshold|size|capacity"
+  }
+}

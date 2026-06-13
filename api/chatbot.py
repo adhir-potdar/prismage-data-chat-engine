@@ -13,8 +13,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
-from langchain_community.utilities import SQLDatabase
-
 from adapters.database import create_database
 from adapters.llm import create_llm
 from engine.metadata.loader import MetadataLoader
@@ -160,25 +158,26 @@ def build_plugin_engine(
     llm_provider: str | None = None,
     llm_model: str | None = None,
     **kwargs,
-) -> ChatbotChain:
+):
     """
-    Build a ChatbotChain for a named plugin.
+    Build a chain for a named plugin.
 
     Discovers the plugin directory under plugins_root/<plugin>/ and loads
-    its plugin.json manifest to resolve config/prompts paths, then delegates
-    to build_engine().
+    its plugin.json manifest. SQL plugins (default) return a ChatbotChain;
+    embedding plugins (mode="embedding") return an EmbeddingChain.
+    Both share the same .answer(question) -> ChatResponse interface.
 
     Args:
-        plugin:             plugin name (e.g. "haldiram-sales")
+        plugin:             plugin name (e.g. "haldiram-sales", "yield-management")
         plugins_root:       path to the plugins directory (PRISMAGE_PLUGINS_ROOT,
                             default "plugins")
-        connection_string:  SQLAlchemy DB URL
-        llm_provider:       "openai" or "anthropic"
-        llm_model:          model name override
-        **kwargs:           forwarded to build_engine()
+        connection_string:  SQLAlchemy DB URL (SQL plugins only)
+        llm_provider:       "openai" or "anthropic" (SQL plugins only)
+        llm_model:          model name override (SQL plugins only)
+        **kwargs:           forwarded to build_engine() for SQL plugins
 
     Returns:
-        ChatbotChain for the requested plugin.
+        ChatbotChain (SQL plugin) or EmbeddingChain (embedding plugin).
     """
     import os
     from pathlib import Path
@@ -207,6 +206,7 @@ def build_multi_engine(
     Discover and load all plugins under plugins_root/ into a PluginRegistry.
 
     Each subdirectory that contains a plugin.json is treated as a plugin.
+    SQL plugins return ChatbotChain; embedding plugins return EmbeddingChain.
     Returns a PluginRegistry whose .answer(plugin, question) method dispatches
     to the correct plugin engine.
 

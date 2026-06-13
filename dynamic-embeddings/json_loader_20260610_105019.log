@@ -1,0 +1,45 @@
+2026-06-10 10:50:19,682 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:50:19,768 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact.json
+2026-06-10 10:50:19,770 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact.json
+2026-06-10 10:50:19,770 - INFO - File size: 201.52 KB
+2026-06-10 10:50:19,770 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:50:19,784 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact'
+2026-06-10 10:50:19,784 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:50:19,784 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:50:19,784 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:50:19,784 - INFO - Processing document: reasoning_campaign_mgmt_campaignname_qtd_20251001_20251001_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:50:19,784 - INFO - Starting strategy decision process
+2026-06-10 10:50:19,814 - INFO - Selected strategy: hierarchical with confidence: 0.82
+2026-06-10 10:50:19,826 - INFO - Document processed successfully: 89 chunks created using hierarchical strategy
+2026-06-10 10:50:19,826 - INFO - Selected strategy: hierarchical (confidence: 0.82)
+2026-06-10 10:50:19,828 - INFO - Generated 89 high-quality embedding chunks
+2026-06-10 10:50:19,829 - INFO - Document chunking complete: Generated 89 chunks
+2026-06-10 10:50:19,829 - INFO - Vector Generation: Generating embeddings for 89 chunks
+2026-06-10 10:50:19,829 - INFO - Using streaming storage for large chunk set
+2026-06-10 10:50:19,829 - INFO - Streaming embeddings for 89 chunks with buffer size 100
+2026-06-10 10:50:19,829 - INFO - Processing batch 1: 89 chunks (total progress: 89/89)
+2026-06-10 10:50:19,867 - INFO - Processing 89 texts in 6 token-aware batches
+2026-06-10 10:50:19,867 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:50:20,510 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:50:20,620 - INFO - Successfully generated 11 embeddings
+2026-06-10 10:50:20,875 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:50:20,987 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:50:21,979 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:50:22,802 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:50:24,130 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:50:25,607 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:50:25,990 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:50:26,224 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:50:26,224 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:50:28,487 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:50:28,606 - INFO - Successfully generated 10 embeddings
+2026-06-10 10:50:28,817 - INFO - Inserted 89 embeddings into database
+2026-06-10 10:50:28,818 - INFO - Batch 1 complete: 89 embeddings stored (total: 89/89)
+2026-06-10 10:50:28,819 - INFO - Streaming complete: 89 embeddings processed and stored in 1 batches
+2026-06-10 10:50:28,819 - INFO - Streaming storage complete: Processed 89 embeddings in 1 batches
+2026-06-10 10:50:28,819 - INFO - ✓ JSON processing successful!
+2026-06-10 10:50:28,819 - INFO - ✓ Total Chunks: 89
+2026-06-10 10:50:28,819 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-10 10:50:28,819 - INFO - ✓ API Tokens Used: 42993
+2026-06-10 10:50:28,819 - INFO - Database connections closed
+2026-06-10 10:50:28,819 - INFO - Pipeline connections closed

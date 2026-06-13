@@ -1,0 +1,280 @@
+2026-06-10 10:16:48,410 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:16:48,517 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact.json
+2026-06-10 10:16:48,534 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact.json
+2026-06-10 10:16:48,535 - INFO - File size: 4119.04 KB
+2026-06-10 10:16:48,535 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:16:48,570 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact'
+2026-06-10 10:16:48,572 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:16:48,572 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:16:48,572 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:16:48,572 - INFO - Processing document: reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:16:48,572 - INFO - Starting strategy decision process
+2026-06-10 10:16:49,196 - INFO - Selected strategy: hierarchical with confidence: 0.82
+2026-06-10 10:16:49,486 - INFO - Document processed successfully: 1743 chunks created using hierarchical strategy
+2026-06-10 10:16:49,486 - INFO - Selected strategy: hierarchical (confidence: 0.82)
+2026-06-10 10:16:49,539 - INFO - Generated 1743 high-quality embedding chunks
+2026-06-10 10:16:49,540 - INFO - Document chunking complete: Generated 1743 chunks
+2026-06-10 10:16:49,540 - INFO - Vector Generation: Generating embeddings for 1743 chunks
+2026-06-10 10:16:49,540 - INFO - Using streaming storage for large chunk set
+2026-06-10 10:16:49,540 - INFO - Streaming embeddings for 1743 chunks with buffer size 100
+2026-06-10 10:16:49,540 - INFO - Processing batch 1: 100 chunks (total progress: 100/1743)
+2026-06-10 10:16:49,558 - WARNING - Skipping chunk reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1_hier_1_analysis_metadata: 45808 tokens exceeds limit of 7600
+2026-06-10 10:16:49,596 - INFO - Processing 99 texts in 7 token-aware batches
+2026-06-10 10:16:49,596 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:16:50,376 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:50,605 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:16:50,879 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:50,889 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:51,316 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:51,427 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:51,787 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:52,004 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:52,238 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:52,455 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:52,455 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/7 to prevent rate limits
+2026-06-10 10:16:54,807 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:55,019 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:55,338 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:55,339 - INFO - Successfully generated 2 embeddings
+2026-06-10 10:16:55,834 - INFO - Inserted 99 embeddings into database
+2026-06-10 10:16:55,834 - INFO - Batch 1 complete: 99 embeddings stored (total: 99/1743)
+2026-06-10 10:16:55,835 - INFO - Processing batch 2: 100 chunks (total progress: 200/1743)
+2026-06-10 10:16:55,882 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:16:55,882 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:16:56,173 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:56,341 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:16:56,687 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:56,895 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:16:57,401 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:57,684 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:16:57,912 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:57,961 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:58,189 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:16:58,414 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:16:58,415 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:00,794 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:00,905 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:01,149 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:01,149 - INFO - Batch 2 complete: 100 embeddings stored (total: 199/1743)
+2026-06-10 10:17:01,150 - INFO - Processing batch 3: 100 chunks (total progress: 300/1743)
+2026-06-10 10:17:01,189 - INFO - Processing 100 texts in 7 token-aware batches
+2026-06-10 10:17:01,189 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:01,421 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:01,649 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:01,883 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:02,100 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:02,619 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:02,960 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:03,250 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:03,379 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:03,729 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:03,944 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:03,944 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/7 to prevent rate limits
+2026-06-10 10:17:06,292 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:06,506 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:06,721 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:06,722 - INFO - Successfully generated 1 embeddings
+2026-06-10 10:17:06,951 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:06,952 - INFO - Batch 3 complete: 100 embeddings stored (total: 299/1743)
+2026-06-10 10:17:06,952 - INFO - Processing batch 4: 100 chunks (total progress: 400/1743)
+2026-06-10 10:17:06,989 - INFO - Processing 100 texts in 7 token-aware batches
+2026-06-10 10:17:06,990 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:09,319 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:10,824 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:11,196 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:11,341 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:11,688 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:11,922 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:12,270 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:12,501 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:12,757 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:12,976 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:12,976 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/7 to prevent rate limits
+2026-06-10 10:17:15,448 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:15,580 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:15,797 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:15,799 - INFO - Successfully generated 1 embeddings
+2026-06-10 10:17:16,052 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:16,053 - INFO - Batch 4 complete: 100 embeddings stored (total: 399/1743)
+2026-06-10 10:17:16,054 - INFO - Processing batch 5: 100 chunks (total progress: 500/1743)
+2026-06-10 10:17:16,093 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:16,093 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:16,330 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:16,527 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:17,550 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:17,662 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:18,077 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:18,263 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:17:18,607 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:18,844 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:19,762 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:19,840 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:19,840 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:22,096 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:22,218 - INFO - Successfully generated 14 embeddings
+2026-06-10 10:17:22,485 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:22,486 - INFO - Batch 5 complete: 100 embeddings stored (total: 499/1743)
+2026-06-10 10:17:22,487 - INFO - Processing batch 6: 100 chunks (total progress: 600/1743)
+2026-06-10 10:17:22,525 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:22,525 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:22,921 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:23,108 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:23,612 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:23,702 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:23,947 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:24,101 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:24,439 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:24,675 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:17:25,022 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:25,254 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:25,255 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:27,635 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:27,778 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:17:28,064 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:28,065 - INFO - Batch 6 complete: 100 embeddings stored (total: 599/1743)
+2026-06-10 10:17:28,066 - INFO - Processing batch 7: 100 chunks (total progress: 700/1743)
+2026-06-10 10:17:28,105 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:28,105 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:28,642 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:28,721 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:17:29,362 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:29,789 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:30,614 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:31,453 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:31,692 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:31,957 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:32,200 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:32,471 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:17:32,471 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:34,824 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:35,039 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:17:35,278 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:35,278 - INFO - Batch 7 complete: 100 embeddings stored (total: 699/1743)
+2026-06-10 10:17:35,279 - INFO - Processing batch 8: 100 chunks (total progress: 800/1743)
+2026-06-10 10:17:35,316 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:35,316 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:35,615 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:35,870 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:36,108 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:36,443 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:36,679 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:36,904 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:37,255 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:37,394 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:37,628 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:37,960 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:37,961 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:40,348 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:40,474 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:17:40,735 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:40,735 - INFO - Batch 8 complete: 100 embeddings stored (total: 799/1743)
+2026-06-10 10:17:40,736 - INFO - Processing batch 9: 100 chunks (total progress: 900/1743)
+2026-06-10 10:17:40,773 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:40,773 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:41,111 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:41,343 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:41,817 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:41,883 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:42,133 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:42,351 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:42,595 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:42,804 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:43,139 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:43,373 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:43,373 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:45,822 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:45,948 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:17:46,180 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:46,181 - INFO - Batch 9 complete: 100 embeddings stored (total: 899/1743)
+2026-06-10 10:17:46,182 - INFO - Processing batch 10: 100 chunks (total progress: 1000/1743)
+2026-06-10 10:17:46,219 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:46,220 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:46,557 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:46,786 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:47,130 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:47,361 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:47,700 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:47,933 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:48,283 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:48,516 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:48,809 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:48,915 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:48,915 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:51,270 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:51,484 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:17:51,693 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:51,694 - INFO - Batch 10 complete: 100 embeddings stored (total: 999/1743)
+2026-06-10 10:17:51,695 - INFO - Processing batch 11: 100 chunks (total progress: 1100/1743)
+2026-06-10 10:17:51,733 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:51,733 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:51,959 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:52,105 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:52,340 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:52,569 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:52,920 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:53,154 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:53,412 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:53,538 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:53,986 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:54,099 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:54,099 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:17:56,446 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:56,654 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:17:56,884 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:17:56,885 - INFO - Batch 11 complete: 100 embeddings stored (total: 1099/1743)
+2026-06-10 10:17:56,886 - INFO - Processing batch 12: 100 chunks (total progress: 1200/1743)
+2026-06-10 10:17:56,925 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:17:56,925 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:17:57,286 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:57,514 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:58,090 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:58,425 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:58,790 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:58,934 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:59,184 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:59,518 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:59,767 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:17:59,920 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:17:59,920 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:18:02,611 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:03,140 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:18:03,346 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:18:03,347 - INFO - Batch 12 complete: 100 embeddings stored (total: 1199/1743)
+2026-06-10 10:18:03,348 - INFO - Processing batch 13: 100 chunks (total progress: 1300/1743)
+2026-06-10 10:18:03,385 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:18:03,385 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:18:03,719 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:03,954 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:18:04,649 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:04,760 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:18:05,003 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:05,471 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:18:05,960 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:06,081 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:18:06,435 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:06,671 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:18:06,672 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:18:09,034 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:18:09,311 - INFO - Successfully generated 14 embeddings
+2026-06-10 10:18:09,443 - ERROR - Database session error: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "embeddings_campaign_mgmt_text_hash_key"
+DETAIL:  Key (text_hash)=(17bf881d9e4dacaa6e7a98080f999d1795b2922eab1ec5bb101f81e76f275a9b) already exists.
+[SQL: INSERT INTO embeddings_campaign_mgmt (embedding, embedding_model, embedding_created_at, chunk_id, text, text_hash, text_length, path, level, parent_id, children_ids, source_file, document_id, collection_name, content_type, value_types, key_count, str ... 81285 characters truncated ... _campaign_mgmt.created_at, embeddings_campaign_mgmt.updated_at, embeddings_campaign_mgmt.id AS id__1]
+[parameters: {'collection_name__0': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__0': 2, 'text_length__0': 1575, 'children_ids__0': Jsonb([]), 'text_hash__0': '16814ad005454042d16eb9bd0fbc161664c5772d717b306f2f5b7d349c6c4cdf', 'confidence__0': 0.82, 'embedding_model__0': 'text-embedding-3-small', 'processing_pipeline__0': 'vector_embeddings', 'parent_id__0': None, 'source_file__0': None, 'domain_type__0': 'general', 'chunk_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1201_hier_2_dimension_analyses_LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'embedding_created_at__0': datetime.datetime(2026, 6, 10, 4, 48, 9, 312243), 'document_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__0': 'hierarchical', 'performance_metrics__0': Jsonb([]), 'embedding__0': '[-0.042022705078125,0.0347900390625,0.036376953125,-0.018157958984375,0.0029048919677734375,0.006237030029296875,-0.036834716796875,-0.01348114013671 ... (29248 characters truncated) ... 125,-0.000484466552734375,-0.0029354095458984375,0.0079803466796875,0.005069732666015625,0.00011944770812988281,0.033966064453125,0.0182952880859375]', 'content_type__0': 'structured', 'dimension_value__0': 'LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'key_count__0': 2, 'value_types__0': Jsonb(['object']), 'reasoning_content__0': Jsonb([]), 'entity_types__0': Jsonb([]), 'path__0': 'dimension_analyses.LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'semantic_density__0': 0.37209302325581395, 'version__0': '1.0', 'text__0': "In section 'dimension_analyses > LM_MF_Desk_Cricket_E_300x250 (23097538542)', this structure has metrics_analysis containing Total Impressions with m ... (1277 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__1': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__1': 2, 'text_length__1': 1599, 'children_ids__1': Jsonb([]), 'text_hash__1': 'b942cd000a12e2101e60a49233d3d0891759669b4b04d41471e4023ccabfb352', 'confidence__1': 0.82, 'embedding_model__1': 'text-embedding-3-small', 'processing_pipeline__1': 'vector_embeddings', 'parent_id__1': None, 'source_file__1': None, 'domain_type__1': 'general', 'chunk_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1202_hier_2_dimension_analyses_LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'embedding_created_at__1': datetime.datetime(2026, 6, 10, 4, 48, 9, 312457), 'document_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__1': 'hierarchical', 'performance_metrics__1': Jsonb([]), 'embedding__1': '[-0.043487548828125,0.03448486328125,0.035675048828125,-0.0193328857421875,0.0018110275268554688,0.00441741943359375,-0.03619384765625,-0.01425933837 ... (29262 characters truncated) ... 6124267578125,-4.869699478149414e-05,-0.0052947998046875,0.008026123046875,0.004486083984375,-0.0008082389831542969,0.0355224609375,0.01922607421875]', 'content_type__1': 'structured', 'dimension_value__1': 'LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'key_count__1': 2, 'value_types__1': Jsonb(['object']), 'reasoning_content__1': Jsonb([]), 'entity_types__1': Jsonb([]) ... 2600 parameters truncated ... 'text_hash__98': 'f48504409b22db00b5e5fc518c82e805e76fbf3f3001529256c42caae77e2aa4', 'confidence__98': 0.82, 'embedding_model__98': 'text-embedding-3-small', 'processing_pipeline__98': 'vector_embeddings', 'parent_id__98': None, 'source_file__98': None, 'domain_type__98': 'general', 'chunk_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1299_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'embedding_created_at__98': datetime.datetime(2026, 6, 10, 4, 48, 9, 314618), 'document_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__98': 'hierarchical', 'performance_metrics__98': Jsonb([]), 'embedding__98': '[-0.041595458984375,0.034393310546875,0.0274658203125,-0.0251922607421875,0.0099639892578125,0.0035400390625,-0.0406494140625,-0.0180816650390625,0.0 ... (29190 characters truncated) ... 29266357421875,0.001678466796875,-0.00386810302734375,0.0168304443359375,0.004772186279296875,0.001529693603515625,0.0306396484375,0.017303466796875]', 'content_type__98': 'structured', 'dimension_value__98': 'LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'key_count__98': 2, 'value_types__98': Jsonb(['object']), 'reasoning_content__98': Jsonb([]), 'entity_types__98': Jsonb([]), 'path__98': 'dimension_analyses.LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'semantic_density__98': 0.37209302325581395, 'version__98': '1.0', 'text__98': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', this structure has metrics_analysis containing Total Impressions with ... (1373 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__99': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__99': 2, 'text_length__99': 1667, 'children_ids__99': Jsonb([]), 'text_hash__99': '73a9e64db8ddc4464f4d7362d294e12a6800b619fd616a2b22a67dbaa5c4ad09', 'confidence__99': 0.82, 'embedding_model__99': 'text-embedding-3-small', 'processing_pipeline__99': 'vector_embeddings', 'parent_id__99': None, 'source_file__99': None, 'domain_type__99': 'general', 'chunk_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1300_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'embedding_created_at__99': datetime.datetime(2026, 6, 10, 4, 48, 9, 314640), 'document_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__99': 'hierarchical', 'performance_metrics__99': Jsonb([]), 'embedding__99': '[-0.04229736328125,0.033203125,0.02703857421875,-0.02508544921875,0.007190704345703125,0.003467559814453125,-0.040496826171875,-0.0179290771484375,0. ... (29098 characters truncated) ... 839111328125,0.0035152435302734375,-0.0038604736328125,0.0151519775390625,0.006744384765625,0.00293731689453125,0.030975341796875,0.0181121826171875]', 'content_type__99': 'structured', 'dimension_value__99': 'LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'key_count__99': 2, 'value_types__99': Jsonb(['object']), 'reasoning_content__99': Jsonb([]), 'entity_types__99': Jsonb([]), 'path__99': 'dimension_analyses.LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'semantic_density__99': 0.37209302325581395, 'version__99': '1.0', 'text__99': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', this structure has metrics_analysis containing Total Impressions with ... (1369 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2."}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-06-10 10:18:09,443 - ERROR - Failed to insert 100 embeddings: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "embeddings_campaign_mgmt_text_hash_key"
+DETAIL:  Key (text_hash)=(17bf881d9e4dacaa6e7a98080f999d1795b2922eab1ec5bb101f81e76f275a9b) already exists.
+[SQL: INSERT INTO embeddings_campaign_mgmt (embedding, embedding_model, embedding_created_at, chunk_id, text, text_hash, text_length, path, level, parent_id, children_ids, source_file, document_id, collection_name, content_type, value_types, key_count, str ... 81285 characters truncated ... _campaign_mgmt.created_at, embeddings_campaign_mgmt.updated_at, embeddings_campaign_mgmt.id AS id__1]
+[parameters: {'collection_name__0': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__0': 2, 'text_length__0': 1575, 'children_ids__0': Jsonb([]), 'text_hash__0': '16814ad005454042d16eb9bd0fbc161664c5772d717b306f2f5b7d349c6c4cdf', 'confidence__0': 0.82, 'embedding_model__0': 'text-embedding-3-small', 'processing_pipeline__0': 'vector_embeddings', 'parent_id__0': None, 'source_file__0': None, 'domain_type__0': 'general', 'chunk_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1201_hier_2_dimension_analyses_LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'embedding_created_at__0': datetime.datetime(2026, 6, 10, 4, 48, 9, 312243), 'document_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__0': 'hierarchical', 'performance_metrics__0': Jsonb([]), 'embedding__0': '[-0.042022705078125,0.0347900390625,0.036376953125,-0.018157958984375,0.0029048919677734375,0.006237030029296875,-0.036834716796875,-0.01348114013671 ... (29248 characters truncated) ... 125,-0.000484466552734375,-0.0029354095458984375,0.0079803466796875,0.005069732666015625,0.00011944770812988281,0.033966064453125,0.0182952880859375]', 'content_type__0': 'structured', 'dimension_value__0': 'LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'key_count__0': 2, 'value_types__0': Jsonb(['object']), 'reasoning_content__0': Jsonb([]), 'entity_types__0': Jsonb([]), 'path__0': 'dimension_analyses.LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'semantic_density__0': 0.37209302325581395, 'version__0': '1.0', 'text__0': "In section 'dimension_analyses > LM_MF_Desk_Cricket_E_300x250 (23097538542)', this structure has metrics_analysis containing Total Impressions with m ... (1277 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__1': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__1': 2, 'text_length__1': 1599, 'children_ids__1': Jsonb([]), 'text_hash__1': 'b942cd000a12e2101e60a49233d3d0891759669b4b04d41471e4023ccabfb352', 'confidence__1': 0.82, 'embedding_model__1': 'text-embedding-3-small', 'processing_pipeline__1': 'vector_embeddings', 'parent_id__1': None, 'source_file__1': None, 'domain_type__1': 'general', 'chunk_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1202_hier_2_dimension_analyses_LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'embedding_created_at__1': datetime.datetime(2026, 6, 10, 4, 48, 9, 312457), 'document_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__1': 'hierarchical', 'performance_metrics__1': Jsonb([]), 'embedding__1': '[-0.043487548828125,0.03448486328125,0.035675048828125,-0.0193328857421875,0.0018110275268554688,0.00441741943359375,-0.03619384765625,-0.01425933837 ... (29262 characters truncated) ... 6124267578125,-4.869699478149414e-05,-0.0052947998046875,0.008026123046875,0.004486083984375,-0.0008082389831542969,0.0355224609375,0.01922607421875]', 'content_type__1': 'structured', 'dimension_value__1': 'LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'key_count__1': 2, 'value_types__1': Jsonb(['object']), 'reasoning_content__1': Jsonb([]), 'entity_types__1': Jsonb([]) ... 2600 parameters truncated ... 'text_hash__98': 'f48504409b22db00b5e5fc518c82e805e76fbf3f3001529256c42caae77e2aa4', 'confidence__98': 0.82, 'embedding_model__98': 'text-embedding-3-small', 'processing_pipeline__98': 'vector_embeddings', 'parent_id__98': None, 'source_file__98': None, 'domain_type__98': 'general', 'chunk_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1299_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'embedding_created_at__98': datetime.datetime(2026, 6, 10, 4, 48, 9, 314618), 'document_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__98': 'hierarchical', 'performance_metrics__98': Jsonb([]), 'embedding__98': '[-0.041595458984375,0.034393310546875,0.0274658203125,-0.0251922607421875,0.0099639892578125,0.0035400390625,-0.0406494140625,-0.0180816650390625,0.0 ... (29190 characters truncated) ... 29266357421875,0.001678466796875,-0.00386810302734375,0.0168304443359375,0.004772186279296875,0.001529693603515625,0.0306396484375,0.017303466796875]', 'content_type__98': 'structured', 'dimension_value__98': 'LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'key_count__98': 2, 'value_types__98': Jsonb(['object']), 'reasoning_content__98': Jsonb([]), 'entity_types__98': Jsonb([]), 'path__98': 'dimension_analyses.LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'semantic_density__98': 0.37209302325581395, 'version__98': '1.0', 'text__98': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', this structure has metrics_analysis containing Total Impressions with ... (1373 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__99': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__99': 2, 'text_length__99': 1667, 'children_ids__99': Jsonb([]), 'text_hash__99': '73a9e64db8ddc4464f4d7362d294e12a6800b619fd616a2b22a67dbaa5c4ad09', 'confidence__99': 0.82, 'embedding_model__99': 'text-embedding-3-small', 'processing_pipeline__99': 'vector_embeddings', 'parent_id__99': None, 'source_file__99': None, 'domain_type__99': 'general', 'chunk_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1300_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'embedding_created_at__99': datetime.datetime(2026, 6, 10, 4, 48, 9, 314640), 'document_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__99': 'hierarchical', 'performance_metrics__99': Jsonb([]), 'embedding__99': '[-0.04229736328125,0.033203125,0.02703857421875,-0.02508544921875,0.007190704345703125,0.003467559814453125,-0.040496826171875,-0.0179290771484375,0. ... (29098 characters truncated) ... 839111328125,0.0035152435302734375,-0.0038604736328125,0.0151519775390625,0.006744384765625,0.00293731689453125,0.030975341796875,0.0181121826171875]', 'content_type__99': 'structured', 'dimension_value__99': 'LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'key_count__99': 2, 'value_types__99': Jsonb(['object']), 'reasoning_content__99': Jsonb([]), 'entity_types__99': Jsonb([]), 'path__99': 'dimension_analyses.LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'semantic_density__99': 0.37209302325581395, 'version__99': '1.0', 'text__99': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', this structure has metrics_analysis containing Total Impressions with ... (1369 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2."}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-06-10 10:18:09,444 - ERROR - Vector generation failed: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "embeddings_campaign_mgmt_text_hash_key"
+DETAIL:  Key (text_hash)=(17bf881d9e4dacaa6e7a98080f999d1795b2922eab1ec5bb101f81e76f275a9b) already exists.
+[SQL: INSERT INTO embeddings_campaign_mgmt (embedding, embedding_model, embedding_created_at, chunk_id, text, text_hash, text_length, path, level, parent_id, children_ids, source_file, document_id, collection_name, content_type, value_types, key_count, str ... 81285 characters truncated ... _campaign_mgmt.created_at, embeddings_campaign_mgmt.updated_at, embeddings_campaign_mgmt.id AS id__1]
+[parameters: {'collection_name__0': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__0': 2, 'text_length__0': 1575, 'children_ids__0': Jsonb([]), 'text_hash__0': '16814ad005454042d16eb9bd0fbc161664c5772d717b306f2f5b7d349c6c4cdf', 'confidence__0': 0.82, 'embedding_model__0': 'text-embedding-3-small', 'processing_pipeline__0': 'vector_embeddings', 'parent_id__0': None, 'source_file__0': None, 'domain_type__0': 'general', 'chunk_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1201_hier_2_dimension_analyses_LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'embedding_created_at__0': datetime.datetime(2026, 6, 10, 4, 48, 9, 312243), 'document_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__0': 'hierarchical', 'performance_metrics__0': Jsonb([]), 'embedding__0': '[-0.042022705078125,0.0347900390625,0.036376953125,-0.018157958984375,0.0029048919677734375,0.006237030029296875,-0.036834716796875,-0.01348114013671 ... (29248 characters truncated) ... 125,-0.000484466552734375,-0.0029354095458984375,0.0079803466796875,0.005069732666015625,0.00011944770812988281,0.033966064453125,0.0182952880859375]', 'content_type__0': 'structured', 'dimension_value__0': 'LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'key_count__0': 2, 'value_types__0': Jsonb(['object']), 'reasoning_content__0': Jsonb([]), 'entity_types__0': Jsonb([]), 'path__0': 'dimension_analyses.LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'semantic_density__0': 0.37209302325581395, 'version__0': '1.0', 'text__0': "In section 'dimension_analyses > LM_MF_Desk_Cricket_E_300x250 (23097538542)', this structure has metrics_analysis containing Total Impressions with m ... (1277 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__1': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__1': 2, 'text_length__1': 1599, 'children_ids__1': Jsonb([]), 'text_hash__1': 'b942cd000a12e2101e60a49233d3d0891759669b4b04d41471e4023ccabfb352', 'confidence__1': 0.82, 'embedding_model__1': 'text-embedding-3-small', 'processing_pipeline__1': 'vector_embeddings', 'parent_id__1': None, 'source_file__1': None, 'domain_type__1': 'general', 'chunk_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1202_hier_2_dimension_analyses_LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'embedding_created_at__1': datetime.datetime(2026, 6, 10, 4, 48, 9, 312457), 'document_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__1': 'hierarchical', 'performance_metrics__1': Jsonb([]), 'embedding__1': '[-0.043487548828125,0.03448486328125,0.035675048828125,-0.0193328857421875,0.0018110275268554688,0.00441741943359375,-0.03619384765625,-0.01425933837 ... (29262 characters truncated) ... 6124267578125,-4.869699478149414e-05,-0.0052947998046875,0.008026123046875,0.004486083984375,-0.0008082389831542969,0.0355224609375,0.01922607421875]', 'content_type__1': 'structured', 'dimension_value__1': 'LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'key_count__1': 2, 'value_types__1': Jsonb(['object']), 'reasoning_content__1': Jsonb([]), 'entity_types__1': Jsonb([]) ... 2600 parameters truncated ... 'text_hash__98': 'f48504409b22db00b5e5fc518c82e805e76fbf3f3001529256c42caae77e2aa4', 'confidence__98': 0.82, 'embedding_model__98': 'text-embedding-3-small', 'processing_pipeline__98': 'vector_embeddings', 'parent_id__98': None, 'source_file__98': None, 'domain_type__98': 'general', 'chunk_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1299_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'embedding_created_at__98': datetime.datetime(2026, 6, 10, 4, 48, 9, 314618), 'document_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__98': 'hierarchical', 'performance_metrics__98': Jsonb([]), 'embedding__98': '[-0.041595458984375,0.034393310546875,0.0274658203125,-0.0251922607421875,0.0099639892578125,0.0035400390625,-0.0406494140625,-0.0180816650390625,0.0 ... (29190 characters truncated) ... 29266357421875,0.001678466796875,-0.00386810302734375,0.0168304443359375,0.004772186279296875,0.001529693603515625,0.0306396484375,0.017303466796875]', 'content_type__98': 'structured', 'dimension_value__98': 'LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'key_count__98': 2, 'value_types__98': Jsonb(['object']), 'reasoning_content__98': Jsonb([]), 'entity_types__98': Jsonb([]), 'path__98': 'dimension_analyses.LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'semantic_density__98': 0.37209302325581395, 'version__98': '1.0', 'text__98': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', this structure has metrics_analysis containing Total Impressions with ... (1373 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__99': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__99': 2, 'text_length__99': 1667, 'children_ids__99': Jsonb([]), 'text_hash__99': '73a9e64db8ddc4464f4d7362d294e12a6800b619fd616a2b22a67dbaa5c4ad09', 'confidence__99': 0.82, 'embedding_model__99': 'text-embedding-3-small', 'processing_pipeline__99': 'vector_embeddings', 'parent_id__99': None, 'source_file__99': None, 'domain_type__99': 'general', 'chunk_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1300_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'embedding_created_at__99': datetime.datetime(2026, 6, 10, 4, 48, 9, 314640), 'document_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__99': 'hierarchical', 'performance_metrics__99': Jsonb([]), 'embedding__99': '[-0.04229736328125,0.033203125,0.02703857421875,-0.02508544921875,0.007190704345703125,0.003467559814453125,-0.040496826171875,-0.0179290771484375,0. ... (29098 characters truncated) ... 839111328125,0.0035152435302734375,-0.0038604736328125,0.0151519775390625,0.006744384765625,0.00293731689453125,0.030975341796875,0.0181121826171875]', 'content_type__99': 'structured', 'dimension_value__99': 'LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'key_count__99': 2, 'value_types__99': Jsonb(['object']), 'reasoning_content__99': Jsonb([]), 'entity_types__99': Jsonb([]), 'path__99': 'dimension_analyses.LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'semantic_density__99': 0.37209302325581395, 'version__99': '1.0', 'text__99': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', this structure has metrics_analysis containing Total Impressions with ... (1369 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2."}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-06-10 10:18:09,444 - ERROR - ✗ Processing failed: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "embeddings_campaign_mgmt_text_hash_key"
+DETAIL:  Key (text_hash)=(17bf881d9e4dacaa6e7a98080f999d1795b2922eab1ec5bb101f81e76f275a9b) already exists.
+[SQL: INSERT INTO embeddings_campaign_mgmt (embedding, embedding_model, embedding_created_at, chunk_id, text, text_hash, text_length, path, level, parent_id, children_ids, source_file, document_id, collection_name, content_type, value_types, key_count, str ... 81285 characters truncated ... _campaign_mgmt.created_at, embeddings_campaign_mgmt.updated_at, embeddings_campaign_mgmt.id AS id__1]
+[parameters: {'collection_name__0': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__0': 2, 'text_length__0': 1575, 'children_ids__0': Jsonb([]), 'text_hash__0': '16814ad005454042d16eb9bd0fbc161664c5772d717b306f2f5b7d349c6c4cdf', 'confidence__0': 0.82, 'embedding_model__0': 'text-embedding-3-small', 'processing_pipeline__0': 'vector_embeddings', 'parent_id__0': None, 'source_file__0': None, 'domain_type__0': 'general', 'chunk_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1201_hier_2_dimension_analyses_LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'embedding_created_at__0': datetime.datetime(2026, 6, 10, 4, 48, 9, 312243), 'document_id__0': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__0': 'hierarchical', 'performance_metrics__0': Jsonb([]), 'embedding__0': '[-0.042022705078125,0.0347900390625,0.036376953125,-0.018157958984375,0.0029048919677734375,0.006237030029296875,-0.036834716796875,-0.01348114013671 ... (29248 characters truncated) ... 125,-0.000484466552734375,-0.0029354095458984375,0.0079803466796875,0.005069732666015625,0.00011944770812988281,0.033966064453125,0.0182952880859375]', 'content_type__0': 'structured', 'dimension_value__0': 'LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'key_count__0': 2, 'value_types__0': Jsonb(['object']), 'reasoning_content__0': Jsonb([]), 'entity_types__0': Jsonb([]), 'path__0': 'dimension_analyses.LM_MF_Desk_Cricket_E_300x250 (23097538542)', 'semantic_density__0': 0.37209302325581395, 'version__0': '1.0', 'text__0': "In section 'dimension_analyses > LM_MF_Desk_Cricket_E_300x250 (23097538542)', this structure has metrics_analysis containing Total Impressions with m ... (1277 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__1': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__1': 2, 'text_length__1': 1599, 'children_ids__1': Jsonb([]), 'text_hash__1': 'b942cd000a12e2101e60a49233d3d0891759669b4b04d41471e4023ccabfb352', 'confidence__1': 0.82, 'embedding_model__1': 'text-embedding-3-small', 'processing_pipeline__1': 'vector_embeddings', 'parent_id__1': None, 'source_file__1': None, 'domain_type__1': 'general', 'chunk_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1202_hier_2_dimension_analyses_LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'embedding_created_at__1': datetime.datetime(2026, 6, 10, 4, 48, 9, 312457), 'document_id__1': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__1': 'hierarchical', 'performance_metrics__1': Jsonb([]), 'embedding__1': '[-0.043487548828125,0.03448486328125,0.035675048828125,-0.0193328857421875,0.0018110275268554688,0.00441741943359375,-0.03619384765625,-0.01425933837 ... (29262 characters truncated) ... 6124267578125,-4.869699478149414e-05,-0.0052947998046875,0.008026123046875,0.004486083984375,-0.0008082389831542969,0.0355224609375,0.01922607421875]', 'content_type__1': 'structured', 'dimension_value__1': 'LM_MF_Desk_Cricket_F_300x250 (23097837322)', 'key_count__1': 2, 'value_types__1': Jsonb(['object']), 'reasoning_content__1': Jsonb([]), 'entity_types__1': Jsonb([]) ... 2600 parameters truncated ... 'text_hash__98': 'f48504409b22db00b5e5fc518c82e805e76fbf3f3001529256c42caae77e2aa4', 'confidence__98': 0.82, 'embedding_model__98': 'text-embedding-3-small', 'processing_pipeline__98': 'vector_embeddings', 'parent_id__98': None, 'source_file__98': None, 'domain_type__98': 'general', 'chunk_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1299_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'embedding_created_at__98': datetime.datetime(2026, 6, 10, 4, 48, 9, 314618), 'document_id__98': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__98': 'hierarchical', 'performance_metrics__98': Jsonb([]), 'embedding__98': '[-0.041595458984375,0.034393310546875,0.0274658203125,-0.0251922607421875,0.0099639892578125,0.0035400390625,-0.0406494140625,-0.0180816650390625,0.0 ... (29190 characters truncated) ... 29266357421875,0.001678466796875,-0.00386810302734375,0.0168304443359375,0.004772186279296875,0.001529693603515625,0.0306396484375,0.017303466796875]', 'content_type__98': 'structured', 'dimension_value__98': 'LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'key_count__98': 2, 'value_types__98': Jsonb(['object']), 'reasoning_content__98': Jsonb([]), 'entity_types__98': Jsonb([]), 'path__98': 'dimension_analyses.LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', 'semantic_density__98': 0.37209302325581395, 'version__98': '1.0', 'text__98': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_I1_468x60 (21861994101)', this structure has metrics_analysis containing Total Impressions with ... (1373 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2.", 'collection_name__99': 'adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101', 'level__99': 2, 'text_length__99': 1667, 'children_ids__99': Jsonb([]), 'text_hash__99': '73a9e64db8ddc4464f4d7362d294e12a6800b619fd616a2b22a67dbaa5c4ad09', 'confidence__99': 0.82, 'embedding_model__99': 'text-embedding-3-small', 'processing_pipeline__99': 'vector_embeddings', 'parent_id__99': None, 'source_file__99': None, 'domain_type__99': 'general', 'chunk_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact_chunk_1300_hier_2_dimension_analyses_LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'embedding_created_at__99': datetime.datetime(2026, 6, 10, 4, 48, 9, 314640), 'document_id__99': 'reasoning_campaign_mgmt_adunit_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact', 'strategy__99': 'hierarchical', 'performance_metrics__99': Jsonb([]), 'embedding__99': '[-0.04229736328125,0.033203125,0.02703857421875,-0.02508544921875,0.007190704345703125,0.003467559814453125,-0.040496826171875,-0.0179290771484375,0. ... (29098 characters truncated) ... 839111328125,0.0035152435302734375,-0.0038604736328125,0.0151519775390625,0.006744384765625,0.00293731689453125,0.030975341796875,0.0181121826171875]', 'content_type__99': 'structured', 'dimension_value__99': 'LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'key_count__99': 2, 'value_types__99': Jsonb(['object']), 'reasoning_content__99': Jsonb([]), 'entity_types__99': Jsonb([]), 'path__99': 'dimension_analyses.LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', 'semantic_density__99': 0.37209302325581395, 'version__99': '1.0', 'text__99': "In section 'dimension_analyses > LM_MF_Desk_LV_Infeed_J1_468x60 (22774468573)', this structure has metrics_analysis containing Total Impressions with ... (1369 characters truncated) ... ve View % Viewable Impressions remained stable by 0.00% with ', has summary containing total_metrics 8, available_metrics 6, not_available_metrics 2."}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-06-10 10:18:09,445 - INFO - Database connections closed
+2026-06-10 10:18:09,445 - INFO - Pipeline connections closed

@@ -1,0 +1,56 @@
+{
+  "description": "Configuration for advertising and ad-tech analytics data",
+  "version": "1.0",
+  "extends": "analytics.json",
+  "domain_patterns": {
+    "advertising": ["ad", "advertisement", "campaign", "creative", "placement"],
+    "adtech_analytics": ["yield", "inventory", "monetization", "optimization"],
+    "revenue": ["revenue", "earnings", "income", "cpm", "ecpm", "rpm"],
+    "traffic": ["traffic", "impressions", "views", "clicks", "sessions"],
+    "targeting": ["targeting", "audience", "demographic", "behavioral"],
+    "inventory": ["inventory", "ad_unit", "slot", "placement", "space"],
+    "geography": ["geography", "geo", "location", "region", "country", "territory"],
+    "devices": ["device", "platform", "mobile", "desktop", "tablet", "browser"],
+    "sources": ["source", "channel", "partner", "network", "exchange"]
+  },
+  "metric_patterns": {
+    "advertising_metrics": "ecpm|cpm|ctr|cpc|cpa|roas|fill_rate|viewability",
+    "revenue_metrics": "revenue|earnings|income|profit|yield|monetization",
+    "traffic_metrics": "impressions|views|clicks|sessions|pageviews|visitors",
+    "engagement_metrics": "engagement|interaction|bounce_rate|time_spent",
+    "conversion_metrics": "conversion|cvr|conversion_rate|leads|acquisitions"
+  },
+  "entity_indicators": {
+    "properties": ["property", "site", "domain", "website", "publication"],
+    "ad_units": ["ad_unit", "slot", "placement", "creative", "banner"],
+    "campaigns": ["campaign", "advertiser", "brand", "client"],
+    "geography": ["country", "region", "state", "city", "territory"],
+    "devices": ["device_type", "platform", "browser", "os", "mobile"],
+    "sources": ["source", "channel", "partner", "network", "referrer"],
+    "time_dimensions": ["hour", "day", "week", "month", "quarter", "year"]
+  },
+  "content_type_patterns": {
+    "revenue": ["\\$\\d+", "revenue|earnings|income", "ecpm|cpm|rpm"],
+    "percentages": ["\\d+%", "fill_rate|ctr|cvr", "percentage|percent"],
+    "large_numbers": ["\\d{1,3}(,\\d{3})*", "impressions|views|clicks"],
+    "rates": ["\\d+\\.\\d+%", "rate|ratio|percentage"]
+  },
+  "performance_keywords": [
+    "performance", "optimization", "yield", "monetization", "efficiency",
+    "fill_rate", "viewability", "engagement", "conversion", "revenue_optimization",
+    "inventory_optimization", "targeting_optimization", "bid_optimization"
+  ],
+  "reasoning_keywords": [
+    "performance_driven", "traffic_driven", "revenue_driven", "yield_driven",
+    "optimization_result", "campaign_impact", "seasonal_effect", "market_trend",
+    "inventory_change", "demand_shift", "supply_change", "pricing_impact"
+  ],
+  "drill_down_indicators": [
+    "drill_down", "breakdown", "hierarchical_analysis", "detailed_view",
+    "granular_analysis", "dimensional_breakdown", "segment_analysis"
+  ],
+  "comparison_periods": [
+    "period1", "period2", "baseline", "comparison", "previous",
+    "current", "last_week", "last_month", "year_over_year"
+  ]
+}

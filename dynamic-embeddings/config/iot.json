@@ -1,0 +1,105 @@
+{
+  "description": "Minimal configuration",
+  "version": "1.0",
+  "domain_patterns": {
+    "general": [
+      "data",
+      "info",
+      "content",
+      "item"
+    ],
+    "iot": [
+      "sensor",
+      "device",
+      "telemetry",
+      "measurement",
+      "iot"
+    ],
+    "sensors": [
+      "temperature",
+      "humidity",
+      "pressure",
+      "motion",
+      "light"
+    ],
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "cellular",
+      "lora",
+      "zigbee"
+    ],
+    "data_types": [
+      "reading",
+      "measurement",
+      "value",
+      "signal",
+      "status"
+    ]
+  },
+  "metric_patterns": {
+    "basic": "count|total|number|value",
+    "sensor_readings": "temperature|humidity|pressure|voltage",
+    "signal_quality": "rssi|snr|signal_strength|battery",
+    "timestamps": "timestamp|datetime|recorded_at"
+  },
+  "entity_indicators": {
+    "basic": [
+      "id",
+      "name",
+      "type",
+      "key"
+    ],
+    "devices": [
+      "device",
+      "sensor",
+      "gateway",
+      "node"
+    ],
+    "locations": [
+      "room",
+      "building",
+      "floor",
+      "zone",
+      "area"
+    ],
+    "measurements": [
+      "reading",
+      "value",
+      "measurement",
+      "data"
+    ]
+  },
+  "content_type_patterns": {},
+  "performance_keywords": [
+    "performance",
+    "metric",
+    "score",
+    "signal_quality",
+    "battery_level",
+    "connectivity"
+  ],
+  "reasoning_keywords": [
+    "reason",
+    "analysis",
+    "explanation",
+    "calibration",
+    "maintenance",
+    "alert",
+    "threshold"
+  ],
+  "decision_thresholds": {
+    "max_flat_depth": 3,
+    "max_flat_keys": 20,
+    "min_hierarchical_depth": 4,
+    "semantic_content_ratio": 0.3,
+    "dimensional_array_ratio": 0.4,
+    "large_document_size": 1000000
+  },
+  "strategy_weights": {
+    "structure_weight": 0.4,
+    "content_weight": 0.3,
+    "size_weight": 0.2,
+    "performance_weight": 0.1
+  }
+}

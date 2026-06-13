@@ -1,0 +1,38 @@
+2026-06-10 10:52:54,552 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:52:54,641 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact.json
+2026-06-10 10:52:54,641 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact.json
+2026-06-10 10:52:54,641 - INFO - File size: 39.85 KB
+2026-06-10 10:52:54,641 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:52:54,656 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact'
+2026-06-10 10:52:54,656 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:54,656 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:54,656 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:54,656 - INFO - Processing document: reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact
+2026-06-10 10:52:54,656 - INFO - Starting strategy decision process
+2026-06-10 10:52:54,662 - INFO - Selected strategy: hierarchical with confidence: 0.82
+2026-06-10 10:52:54,666 - INFO - Document processed successfully: 19 chunks created using hierarchical strategy
+2026-06-10 10:52:54,666 - INFO - Selected strategy: hierarchical (confidence: 0.82)
+2026-06-10 10:52:54,666 - WARNING - ✗ Failed to extract dimension_value from path='dimension_analyses'
+2026-06-10 10:52:54,667 - INFO - Generated 19 high-quality embedding chunks
+2026-06-10 10:52:54,667 - INFO - Document chunking complete: Generated 19 chunks
+2026-06-10 10:52:54,667 - INFO - Vector Generation: Generating embeddings for 19 chunks
+2026-06-10 10:52:54,667 - INFO - Using traditional storage for small chunk set
+2026-06-10 10:52:54,667 - INFO - Generating embeddings for 19 chunks
+2026-06-10 10:52:54,675 - WARNING - Skipping chunk reasoning_campaign_mgmt_property_dod_20251231_20251231_vs_20260101_20260101_date_20260101_compact_chunk_3_hier_1_dimension_analyses: 9137 tokens exceeds limit of 7600
+2026-06-10 10:52:54,677 - WARNING - Skipped 1 chunks due to token limits. Processing 18 valid chunks.
+2026-06-10 10:52:54,682 - INFO - Processing 18 texts in 2 token-aware batches
+2026-06-10 10:52:55,239 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:52:55,456 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:52:55,693 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:52:55,698 - INFO - Successfully generated 3 embeddings
+2026-06-10 10:52:55,699 - INFO - Successfully generated 18 vector embeddings
+2026-06-10 10:52:55,699 - INFO - Vector Generation: Generated 18 vector embeddings
+2026-06-10 10:52:55,699 - INFO - Vector Storage: Storing embeddings in PGVector database
+2026-06-10 10:52:55,768 - INFO - Inserted 18 embeddings into database
+2026-06-10 10:52:55,769 - INFO - Vector storage complete: Stored 18 embeddings in database
+2026-06-10 10:52:55,769 - INFO - ✓ JSON processing successful!
+2026-06-10 10:52:55,769 - INFO - ✓ Total Chunks: 19
+2026-06-10 10:52:55,769 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-10 10:52:55,769 - INFO - ✓ API Tokens Used: 9658
+2026-06-10 10:52:55,769 - INFO - Database connections closed
+2026-06-10 10:52:55,769 - INFO - Pipeline connections closed

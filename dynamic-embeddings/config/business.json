@@ -1,0 +1,57 @@
+{
+  "description": "Configuration for business data and entity analysis",
+  "version": "1.0",
+  "extends": "default.json",
+  "domain_patterns": {
+    "customers": ["customer", "client", "user", "account", "subscriber"],
+    "products": ["product", "item", "service", "offering", "catalog"],
+    "orders": ["order", "transaction", "purchase", "sale", "payment"],
+    "organization": ["company", "organization", "department", "team"],
+    "finance": ["finance", "accounting", "billing", "invoice", "payment"],
+    "operations": ["operations", "logistics", "fulfillment", "delivery"],
+    "marketing": ["marketing", "campaign", "promotion", "lead", "prospect"],
+    "support": ["support", "ticket", "issue", "complaint", "feedback"]
+  },
+  "metric_patterns": {
+    "financial": "price|cost|revenue|profit|budget|expense",
+    "quantities": "quantity|count|amount|volume|units",
+    "ratings": "rating|score|review|satisfaction|quality",
+    "dates": "date|created|updated|modified|expired",
+    "status": "status|state|condition|active|inactive"
+  },
+  "entity_indicators": {
+    "persons": ["customer", "user", "employee", "contact", "person"],
+    "organizations": ["company", "organization", "supplier", "vendor"],
+    "products": ["product", "service", "sku", "item", "offering"],
+    "transactions": ["order", "transaction", "payment", "invoice"],
+    "locations": ["address", "location", "office", "warehouse", "store"],
+    "communications": ["email", "phone", "message", "notification"]
+  },
+  "content_type_patterns": {
+    "email_addresses": ["[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"],
+    "phone_numbers": ["\\+?\\d{1,3}[-.\\s]?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}"],
+    "addresses": ["street|avenue|road|boulevard|drive|lane"],
+    "currencies": ["\\$\\d+", "€\\d+", "£\\d+", "USD|EUR|GBP"],
+    "business_identifiers": ["[A-Z]{2,}\\d+", "ID-\\d+", "REF-\\d+"]
+  },
+  "performance_keywords": [
+    "performance", "growth", "success", "achievement", "target",
+    "goal", "objective", "milestone", "kpi", "metric"
+  ],
+  "reasoning_keywords": [
+    "preference", "requirement", "specification", "policy", "rule",
+    "guideline", "standard", "procedure", "process", "workflow"
+  ],
+  "business_contexts": [
+    "sales", "marketing", "finance", "operations", "hr",
+    "legal", "compliance", "strategy", "planning", "execution"
+  ],
+  "relationship_indicators": [
+    "parent", "child", "related", "associated", "linked",
+    "belongs_to", "owned_by", "managed_by", "assigned_to"
+  ],
+  "lifecycle_stages": [
+    "created", "active", "pending", "approved", "rejected",
+    "completed", "cancelled", "expired", "archived", "deleted"
+  ]
+}

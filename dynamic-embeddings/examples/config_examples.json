@@ -1,0 +1,84 @@
+{
+  "adtech_analytics_config": {
+    "domain_patterns": {
+      "advertising": ["ecpm", "cpm", "revenue", "impressions", "fill_rate", "ad_unit"],
+      "analytics": ["metric", "analysis", "performance", "trend", "kpi"],
+      "geography": ["geography", "region", "country", "location"],
+      "devices": ["device_type", "mobile", "desktop", "tablet"],
+      "temporal": ["period", "date", "timestamp", "daily", "weekly"]
+    },
+    "metric_patterns": {
+      "percentage": "percent|%|ratio|rate",
+      "change": "change|delta|diff|growth|decline",
+      "advertising_metrics": "ecpm|cpm|ctr|cpc|fill_rate|viewability",
+      "revenue": "revenue|earnings|income|profit"
+    },
+    "entity_indicators": {
+      "properties": ["property", "site", "domain", "source"],
+      "advertising": ["ad_unit", "creative", "campaign", "placement"],
+      "performance": ["ecpm", "revenue", "impressions", "clicks"]
+    },
+    "performance_keywords": [
+      "performance", "optimization", "yield", "efficiency", "ecpm",
+      "revenue", "growth", "improvement", "trend", "analysis"
+    ],
+    "reasoning_keywords": [
+      "reason", "reasoning", "driven_by", "due_to", "caused_by",
+      "explanation", "analysis", "insight", "conclusion"
+    ]
+  },
+
+  "e_commerce_config": {
+    "domain_patterns": {
+      "commerce": ["product", "order", "customer", "purchase", "cart"],
+      "inventory": ["stock", "quantity", "availability", "sku"],
+      "pricing": ["price", "cost", "discount", "promotion", "sale"],
+      "shipping": ["shipping", "delivery", "fulfillment", "logistics"]
+    },
+    "metric_patterns": {
+      "financial": "price|cost|revenue|profit|discount",
+      "quantity": "quantity|count|stock|inventory",
+      "ratings": "rating|review|score|feedback"
+    },
+    "entity_indicators": {
+      "products": ["product", "item", "sku", "catalog"],
+      "customers": ["customer", "user", "buyer", "account"],
+      "transactions": ["order", "transaction", "payment", "purchase"]
+    }
+  },
+
+  "system_config_analysis": {
+    "domain_patterns": {
+      "system": ["system", "service", "application", "server"],
+      "configuration": ["config", "setting", "parameter", "option"],
+      "security": ["auth", "security", "permission", "access"],
+      "network": ["network", "endpoint", "url", "port", "host"]
+    },
+    "metric_patterns": {
+      "technical": "timeout|retry|limit|threshold|capacity",
+      "boolean_flags": "enabled|disabled|active|inactive"
+    },
+    "entity_indicators": {
+      "services": ["service", "api", "endpoint", "component"],
+      "settings": ["setting", "config", "parameter", "property"],
+      "security": ["token", "key", "credential", "certificate"]
+    }
+  },
+
+  "minimal_generic_config": {
+    "domain_patterns": {
+      "general": ["data", "info", "content", "object", "item"]
+    },
+    "metric_patterns": {
+      "numeric": "\\d+\\.?\\d*",
+      "percentage": "percent|%"
+    },
+    "entity_indicators": {
+      "basic": ["id", "name", "type", "value", "key"]
+    },
+    "performance_keywords": ["metric", "measure", "count"],
+    "reasoning_keywords": ["note", "comment", "description"],
+    "metadata_keywords": ["meta", "info", "header"],
+    "technical_keys": ["id", "type", "timestamp", "version"]
+  }
+}

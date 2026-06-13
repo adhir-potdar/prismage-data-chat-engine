@@ -1,0 +1,77 @@
+2026-06-10 10:51:17,553 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:51:17,650 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact.json
+2026-06-10 10:51:17,653 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact.json
+2026-06-10 10:51:17,653 - INFO - File size: 552.82 KB
+2026-06-10 10:51:17,653 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:51:17,666 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact'
+2026-06-10 10:51:17,666 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:51:17,666 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:51:17,666 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:51:17,666 - INFO - Processing document: reasoning_campaign_mgmt_lineitem_mom_20251101_20251101_vs_20251201_20251201_date_20260101_compact
+2026-06-10 10:51:17,666 - INFO - Starting strategy decision process
+2026-06-10 10:51:17,751 - INFO - Selected strategy: hierarchical with confidence: 0.82
+2026-06-10 10:51:17,785 - INFO - Document processed successfully: 238 chunks created using hierarchical strategy
+2026-06-10 10:51:17,785 - INFO - Selected strategy: hierarchical (confidence: 0.82)
+2026-06-10 10:51:17,792 - INFO - Generated 238 high-quality embedding chunks
+2026-06-10 10:51:17,792 - INFO - Document chunking complete: Generated 238 chunks
+2026-06-10 10:51:17,792 - INFO - Vector Generation: Generating embeddings for 238 chunks
+2026-06-10 10:51:17,792 - INFO - Using streaming storage for large chunk set
+2026-06-10 10:51:17,792 - INFO - Streaming embeddings for 238 chunks with buffer size 100
+2026-06-10 10:51:17,792 - INFO - Processing batch 1: 100 chunks (total progress: 100/238)
+2026-06-10 10:51:17,842 - INFO - Processing 100 texts in 8 token-aware batches
+2026-06-10 10:51:17,842 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:51:18,430 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:18,436 - INFO - Successfully generated 1 embeddings
+2026-06-10 10:51:18,818 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:18,822 - INFO - Successfully generated 6 embeddings
+2026-06-10 10:51:19,130 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:19,355 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:19,615 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:19,628 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:19,894 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:19,909 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:19,909 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/8 to prevent rate limits
+2026-06-10 10:51:22,169 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:22,488 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:22,798 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:22,908 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:23,209 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:23,214 - INFO - Successfully generated 8 embeddings
+2026-06-10 10:51:23,472 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:51:23,473 - INFO - Batch 1 complete: 100 embeddings stored (total: 100/238)
+2026-06-10 10:51:23,473 - INFO - Processing batch 2: 100 chunks (total progress: 200/238)
+2026-06-10 10:51:23,510 - INFO - Processing 100 texts in 6 token-aware batches
+2026-06-10 10:51:23,510 - INFO - Pacing enabled: 2s delay after every 5 batches
+2026-06-10 10:51:23,769 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:23,850 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:24,632 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:25,929 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:26,201 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:26,315 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:26,583 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:26,595 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:26,868 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:26,877 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:26,877 - INFO - ⏸️  Pacing: Adding 2s delay after batch 5/6 to prevent rate limits
+2026-06-10 10:51:29,613 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:30,439 - INFO - Successfully generated 15 embeddings
+2026-06-10 10:51:30,656 - INFO - Inserted 100 embeddings into database
+2026-06-10 10:51:30,657 - INFO - Batch 2 complete: 100 embeddings stored (total: 200/238)
+2026-06-10 10:51:30,657 - INFO - Processing batch 3: 38 chunks (total progress: 238/238)
+2026-06-10 10:51:30,671 - INFO - Processing 38 texts in 3 token-aware batches
+2026-06-10 10:51:30,913 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:31,120 - INFO - Successfully generated 17 embeddings
+2026-06-10 10:51:31,397 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:31,428 - INFO - Successfully generated 18 embeddings
+2026-06-10 10:51:31,699 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:51:31,783 - INFO - Successfully generated 3 embeddings
+2026-06-10 10:51:31,921 - INFO - Inserted 38 embeddings into database
+2026-06-10 10:51:31,922 - INFO - Batch 3 complete: 38 embeddings stored (total: 238/238)
+2026-06-10 10:51:31,922 - INFO - Streaming complete: 238 embeddings processed and stored in 3 batches
+2026-06-10 10:51:31,922 - INFO - Streaming storage complete: Processed 238 embeddings in 3 batches
+2026-06-10 10:51:31,922 - INFO - ✓ JSON processing successful!
+2026-06-10 10:51:31,922 - INFO - ✓ Total Chunks: 238
+2026-06-10 10:51:31,922 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-10 10:51:31,922 - INFO - ✓ API Tokens Used: 119368
+2026-06-10 10:51:31,923 - INFO - Database connections closed
+2026-06-10 10:51:31,923 - INFO - Pipeline connections closed

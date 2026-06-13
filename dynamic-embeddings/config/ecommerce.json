@@ -1,0 +1,58 @@
+{
+  "description": "Configuration for e-commerce and retail data analysis",
+  "version": "1.0",
+  "extends": "business.json",
+  "domain_patterns": {
+    "ecommerce": ["ecommerce", "retail", "online", "store", "shop"],
+    "catalog": ["catalog", "inventory", "stock", "sku", "variant"],
+    "shopping": ["cart", "checkout", "purchase", "buy", "order"],
+    "pricing": ["price", "cost", "discount", "sale", "promotion"],
+    "shipping": ["shipping", "delivery", "fulfillment", "logistics"],
+    "payments": ["payment", "billing", "charge", "refund", "transaction"],
+    "reviews": ["review", "rating", "feedback", "comment", "testimonial"],
+    "categories": ["category", "collection", "brand", "type", "genre"]
+  },
+  "metric_patterns": {
+    "ecommerce_metrics": "conversion_rate|cart_abandonment|aov|ltv",
+    "inventory_metrics": "stock_level|availability|out_of_stock|backorder",
+    "sales_metrics": "sales|revenue|units_sold|volume|turnover",
+    "customer_metrics": "customer_acquisition|retention|churn|satisfaction",
+    "pricing_metrics": "price|discount|margin|markup|cost"
+  },
+  "entity_indicators": {
+    "products": ["product", "item", "sku", "variant", "model"],
+    "customers": ["customer", "buyer", "shopper", "user", "account"],
+    "orders": ["order", "purchase", "transaction", "sale"],
+    "inventory": ["inventory", "stock", "warehouse", "fulfillment"],
+    "promotions": ["promotion", "discount", "coupon", "deal", "offer"],
+    "categories": ["category", "collection", "brand", "department"],
+    "reviews": ["review", "rating", "feedback", "comment"]
+  },
+  "content_type_patterns": {
+    "product_codes": ["[A-Z]{2,4}\\d+", "SKU-\\d+", "PROD-\\d+"],
+    "prices": ["\\$\\d+\\.\\d{2}", "€\\d+,\\d{2}", "£\\d+\\.\\d{2}"],
+    "ratings": ["\\d+/\\d+", "\\d+\\.\\d+ stars?", "\\d+%"],
+    "discounts": ["\\d+% off", "save \\$\\d+", "\\d+% discount"],
+    "sizes": ["XS|S|M|L|XL|XXL", "\\d+\\.?\\d*\"", "size \\d+"]
+  },
+  "performance_keywords": [
+    "conversion", "performance", "optimization", "growth", "sales",
+    "revenue", "profit", "margin", "roi", "efficiency"
+  ],
+  "reasoning_keywords": [
+    "popular", "trending", "bestseller", "recommended", "featured",
+    "seasonal", "limited", "exclusive", "new", "updated"
+  ],
+  "ecommerce_contexts": [
+    "catalog_management", "inventory_management", "order_management",
+    "customer_service", "marketing", "analytics", "logistics"
+  ],
+  "shopping_stages": [
+    "browsing", "searching", "viewing", "comparing", "adding_to_cart",
+    "checkout", "payment", "fulfillment", "delivery", "return"
+  ],
+  "product_attributes": [
+    "brand", "model", "color", "size", "material", "weight",
+    "dimensions", "features", "specifications", "warranty"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "description": "Revenue Management configuration - optimized for dimension analysis files",
+  "version": "1.0",
+  "chunking": {
+    "min_hierarchy_depth": 2,
+    "max_hierarchy_depth": 3,
+    "skip_root_summary": true,
+    "skip_section_summaries": true
+  },
+  "domain_patterns": {
+    "analytics": ["cpm", "revenue", "impressions", "dimension", "metric", "period"],
+    "comparison": ["vs", "versus", "period1", "period2", "change", "growth"],
+    "dimensions": ["device", "geo", "property", "overall"]
+  },
+  "metric_patterns": {
+    "numeric": "\\d+\\.?\\d*",
+    "percentage": "percent|%|ratio|change_percentage",
+    "count": "count|total|sum|quantity|impressions",
+    "money": "revenue|cpm|cost",
+    "comparison": "vs|versus|compare|before|after|period1|period2"
+  },
+  "entity_indicators": {
+    "identifiers": ["dimension", "collection_name", "granularity"],
+    "names": ["dimension", "device", "geo", "property"],
+    "values": ["period1_value", "period2_value", "change_absolute", "change_percentage"],
+    "descriptions": ["reasoning", "analysis", "summary"],
+    "types": ["metric", "dimension", "time_granularity"]
+  },
+  "content_type_patterns": {
+    "temporal": ["\\d{4}-\\d{2}-\\d{2}", "\\d{8}", "period", "date", "time_granularity"],
+    "numerical": ["\\d+\\.?\\d*", "value", "change", "cpm", "revenue"],
+    "analysis": ["reasoning", "analysis", "factors", "contributing"],
+    "metadata": ["metadata", "timestamp", "granularity"],
+    "dimension": ["dimension", "device", "geo", "property", "overall"]
+  },
+  "performance_keywords": [
+    "cpm", "revenue", "impressions", "growth", "decline", "change", "performance"
+  ],
+  "reasoning_keywords": [
+    "reasoning", "analysis", "factors", "contributing_factors", "driven", "due to"
+  ],
+  "metadata_keywords": [
+    "metadata", "timestamp", "granularity", "period", "analysis_metadata"
+  ],
+  "entity_collection_keys": [
+    "dimension_analyses", "cpm_reasoning_analysis", "raw_metrics_data"
+  ],
+  "technical_keys": [
+    "period1_start_date", "period1_end_date", "period2_start_date", "period2_end_date",
+    "time_granularity", "total_dimension_values", "analysis_timestamp"
+  ]
+}

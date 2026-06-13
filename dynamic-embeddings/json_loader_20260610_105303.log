@@ -1,0 +1,39 @@
+2026-06-10 10:53:03,725 - INFO - Database connection initialized: postgresql+psycopg:***@localhost:5432/vectordb
+2026-06-10 10:53:03,809 - INFO - Starting processing of: /Users/adhirpotdar/Work/git-repos/prismage-data-chat-engine/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact.json
+2026-06-10 10:53:03,811 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact.json
+2026-06-10 10:53:03,811 - INFO - File size: 36.97 KB
+2026-06-10 10:53:03,811 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-10 10:53:03,823 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact'
+2026-06-10 10:53:03,823 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-10 10:53:03,824 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-10 10:53:03,824 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-10 10:53:03,824 - INFO - Processing document: reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-10 10:53:03,824 - INFO - Starting strategy decision process
+2026-06-10 10:53:03,829 - INFO - Selected strategy: hierarchical with confidence: 0.82
+2026-06-10 10:53:03,833 - INFO - Document processed successfully: 20 chunks created using hierarchical strategy
+2026-06-10 10:53:03,833 - INFO - Selected strategy: hierarchical (confidence: 0.82)
+2026-06-10 10:53:03,834 - WARNING - ✗ Failed to extract dimension_value from path='dimension_analyses'
+2026-06-10 10:53:03,835 - INFO - Generated 20 high-quality embedding chunks
+2026-06-10 10:53:03,835 - INFO - Document chunking complete: Generated 20 chunks
+2026-06-10 10:53:03,835 - INFO - Vector Generation: Generating embeddings for 20 chunks
+2026-06-10 10:53:03,835 - INFO - Using traditional storage for small chunk set
+2026-06-10 10:53:03,835 - INFO - Generating embeddings for 20 chunks
+2026-06-10 10:53:03,842 - WARNING - Skipping chunk reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact_chunk_1_hier_0_root: 8342 tokens exceeds limit of 7600
+2026-06-10 10:53:03,844 - WARNING - Skipping chunk reasoning_campaign_mgmt_property_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact_chunk_4_hier_1_dimension_analyses: 8120 tokens exceeds limit of 7600
+2026-06-10 10:53:03,846 - WARNING - Skipped 2 chunks due to token limits. Processing 18 valid chunks.
+2026-06-10 10:53:03,851 - INFO - Processing 18 texts in 2 token-aware batches
+2026-06-10 10:53:04,366 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:53:04,589 - INFO - Successfully generated 16 embeddings
+2026-06-10 10:53:04,913 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-10 10:53:04,914 - INFO - Successfully generated 2 embeddings
+2026-06-10 10:53:04,915 - INFO - Successfully generated 18 vector embeddings
+2026-06-10 10:53:04,915 - INFO - Vector Generation: Generated 18 vector embeddings
+2026-06-10 10:53:04,915 - INFO - Vector Storage: Storing embeddings in PGVector database
+2026-06-10 10:53:04,974 - INFO - Inserted 18 embeddings into database
+2026-06-10 10:53:04,975 - INFO - Vector storage complete: Stored 18 embeddings in database
+2026-06-10 10:53:04,975 - INFO - ✓ JSON processing successful!
+2026-06-10 10:53:04,975 - INFO - ✓ Total Chunks: 20
+2026-06-10 10:53:04,975 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-10 10:53:04,975 - INFO - ✓ API Tokens Used: 8639
+2026-06-10 10:53:04,975 - INFO - Database connections closed
+2026-06-10 10:53:04,975 - INFO - Pipeline connections closed

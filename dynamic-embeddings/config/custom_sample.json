@@ -1,0 +1,68 @@
+{
+  "description": "Sample custom configuration demonstrating all available options",
+  "version": "1.0",
+  "author": "Dynamic Embeddings User",
+  "extends": "default.json",
+
+  "domain_patterns": {
+    "custom_domain": ["custom", "specific", "domain", "keywords"],
+    "industry_specific": ["industry", "sector", "business", "commercial"],
+    "technical_terms": ["api", "database", "server", "application"]
+  },
+
+  "metric_patterns": {
+    "custom_metrics": "performance|efficiency|throughput|latency",
+    "business_kpis": "revenue|profit|growth|conversion",
+    "technical_metrics": "cpu|memory|disk|network"
+  },
+
+  "entity_indicators": {
+    "objects": ["object", "entity", "item", "record"],
+    "relationships": ["parent", "child", "related", "linked"],
+    "attributes": ["property", "field", "attribute", "value"]
+  },
+
+  "content_type_patterns": {
+    "identifiers": ["ID-\\d+", "REF-[A-Z]\\d+", "UUID-[a-f0-9-]+"],
+    "measurements": ["\\d+\\.\\d+\\s?(kg|lb|cm|inch)", "\\d+%"],
+    "timestamps": ["\\d{4}-\\d{2}-\\d{2}", "\\d{2}:\\d{2}:\\d{2}"]
+  },
+
+  "performance_keywords": [
+    "optimization", "improvement", "efficiency", "speed",
+    "accuracy", "precision", "quality", "reliability"
+  ],
+
+  "reasoning_keywords": [
+    "analysis", "conclusion", "recommendation", "insight",
+    "explanation", "rationale", "justification", "assessment"
+  ],
+
+  "custom_sections": {
+    "data_sources": ["database", "api", "file", "stream"],
+    "processing_stages": ["ingestion", "transformation", "analysis", "output"],
+    "quality_indicators": ["complete", "accurate", "timely", "consistent"]
+  },
+
+  "decision_thresholds": {
+    "max_flat_depth": 3,
+    "max_flat_keys": 15,
+    "min_hierarchical_depth": 4,
+    "semantic_content_ratio": 0.25,
+    "dimensional_array_ratio": 0.35
+  },
+
+  "strategy_weights": {
+    "structure_weight": 0.4,
+    "content_weight": 0.35,
+    "size_weight": 0.15,
+    "performance_weight": 0.1
+  },
+
+  "chunking_preferences": {
+    "preserve_relationships": true,
+    "group_related_content": true,
+    "max_chunk_size": 2048,
+    "min_chunk_size": 100
+  }
+}

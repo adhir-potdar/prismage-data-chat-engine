@@ -1,0 +1,34 @@
+2026-06-08 17:47:05,010 - INFO - Database connection initialized: postgresql:***@localhost:5432/vectordb
+2026-06-08 17:47:05,129 - INFO - Starting processing of: /home/omkar/Desktop/OLD-BKP/omkar/project/New-GEN-AI/Working_project/yield_management/reasoning_output_ex/campaign_mgmt/reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact.json
+2026-06-08 17:47:05,129 - INFO - Successfully loaded JSON file: reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact.json
+2026-06-08 17:47:05,129 - INFO - File size: 2.84 KB
+2026-06-08 17:47:05,129 - INFO - Top-level keys: ['analysis_metadata', 'dimension_analyses']
+2026-06-08 17:47:05,148 - INFO - Deleted 0 embeddings for document 'reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact'
+2026-06-08 17:47:05,149 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-08 17:47:05,149 - INFO - Processing JSON data for document: reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-08 17:47:05,149 - INFO - Document Chunking: Processing JSON data for document reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-08 17:47:05,149 - INFO - Processing document: reasoning_campaign_mgmt_overall_wtd_20251219_20251219_vs_20251226_20251226_date_20260101_compact
+2026-06-08 17:47:05,149 - INFO - Starting strategy decision process
+2026-06-08 17:47:05,151 - INFO - Selected strategy: hierarchical with confidence: 0.73
+2026-06-08 17:47:05,152 - INFO - Document processed successfully: 4 chunks created using hierarchical strategy
+2026-06-08 17:47:05,152 - INFO - Selected strategy: hierarchical (confidence: 0.73)
+2026-06-08 17:47:05,152 - WARNING - ✗ Failed to extract dimension_value from path='dimension_analyses'
+2026-06-08 17:47:05,152 - INFO - Generated 4 high-quality embedding chunks
+2026-06-08 17:47:05,152 - INFO - Document chunking complete: Generated 4 chunks
+2026-06-08 17:47:05,152 - INFO - Vector Generation: Generating embeddings for 4 chunks
+2026-06-08 17:47:05,152 - INFO - Using traditional storage for small chunk set
+2026-06-08 17:47:05,152 - INFO - Generating embeddings for 4 chunks
+2026-06-08 17:47:05,161 - INFO - Processing 4 texts in 1 token-aware batches
+2026-06-08 17:47:07,208 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-08 17:47:07,286 - INFO - Successfully generated 4 embeddings
+2026-06-08 17:47:07,286 - INFO - Successfully generated 4 vector embeddings
+2026-06-08 17:47:07,287 - INFO - Vector Generation: Generated 4 vector embeddings
+2026-06-08 17:47:07,287 - INFO - Vector Storage: Storing embeddings in PGVector database
+2026-06-08 17:47:07,314 - INFO - Inserted 4 embeddings into database
+2026-06-08 17:47:07,315 - INFO - Vector storage complete: Stored 4 embeddings in database
+2026-06-08 17:47:07,315 - INFO - ✓ JSON processing successful!
+2026-06-08 17:47:07,315 - INFO - ✓ Total Chunks: 4
+2026-06-08 17:47:07,315 - INFO - ✓ Strategies Used: ['hierarchical']
+2026-06-08 17:47:07,315 - INFO - ✓ API Tokens Used: 2061
+2026-06-08 17:47:07,316 - INFO - Database connections closed
+2026-06-08 17:47:07,316 - INFO - Pipeline connections closed

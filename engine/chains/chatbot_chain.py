@@ -222,19 +222,16 @@ class ChatbotChain:
             # Filter columns to only those the question asked for (display_metrics),
             # stripping any context metrics added by business rules.
             display_cols = self._display_columns(intent, successful)
-            query_results_data = [
-                {
+            query_results_data = []
+            for i, r in enumerate(successful):
+                cols = display_cols.get(i, [c for c in r.columns if c != "data_as_of" and not c.startswith("data_as_of_")])
+                query_results_data.append({
                     "table": r.query.table,
                     "channel": r.query.channel,
-                    "columns": display_cols.get(i, r.columns),
-                    "rows": [
-                        {k: v for k, v in row.items() if k in display_cols.get(i, r.columns)}
-                        for row in r.rows
-                    ],
+                    "columns": cols,
+                    "rows": [{k: v for k, v in row.items() if k in cols} for row in r.rows],
                     "row_count": r.row_count,
-                }
-                for i, r in enumerate(successful)
-            ]
+                })
 
             return ChatResponse(
                 question=question,
@@ -287,6 +284,8 @@ class ChatbotChain:
         for i, r in enumerate(results):
             kept = []
             for col in r.columns:
+                if col == "data_as_of" or col.startswith("data_as_of_"):
+                    continue
                 # Always keep dimension-like (string) columns
                 sample = r.rows[0].get(col) if r.rows else None
                 if isinstance(sample, str) or sample is None:

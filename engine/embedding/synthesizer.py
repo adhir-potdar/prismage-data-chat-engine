@@ -10,6 +10,7 @@ Both prompt templates are injected from the plugin's prompts_config.
 from __future__ import annotations
 import asyncio
 import logging
+import re
 from typing import Dict, List, Optional
 
 from engine.embedding.searcher import AnalysisResult
@@ -193,6 +194,9 @@ class Synthesizer:
                 quick_summary = parts[0].strip()
                 detail_body = parts[1].strip() if len(parts) > 1 else clean
 
+                # Post-process: filter and sort dimension entries by question direction
+                detail_body = self._filter_and_sort_entries(detail_body, question)
+
                 # Structure: quick_summary \n\n header + detail_body + footer
                 # _split_answer() will pick quick_summary as summary and the rest as detail
                 return quick_summary + '\n\n' + header + detail_body + footer
@@ -201,6 +205,68 @@ class Synthesizer:
             logger.error("Collective synthesis error: %s", exc)
 
         return "Failed to generate collective analysis."
+
+    @staticmethod
+    def _detect_question_direction(question: str) -> str:
+        """Detect what direction (highest/lowest/negative) the question is asking for."""
+        q = question.lower()
+        if any(p in q for p in ['highest negative', 'biggest decline', 'largest drop', 'most decline', 'biggest drop']):
+            return 'highest_negative'
+        if any(p in q for p in ['lowest', 'worst', 'bottom', 'minimum', 'min ']):
+            return 'lowest'
+        if any(p in q for p in ['highest', 'best', 'top', 'maximum', 'max ', 'most growth', 'most positive']):
+            return 'highest_positive'
+        return 'all'
+
+    @staticmethod
+    def _filter_and_sort_entries(detail_body: str, question: str) -> str:
+        """Filter and sort dimension entry blocks in the synthesis output.
+
+        Parses the **Property - Metric (Gran)** blocks, filters by question
+        direction (highest positive / lowest / highest negative), and sorts them.
+        Narrative text (key findings, recommendations) is preserved at the end.
+        """
+        direction = Synthesizer._detect_question_direction(question)
+        if direction == 'all':
+            return detail_body
+
+        # Split into paragraphs; classify each as entry block or narrative
+        paragraphs = detail_body.split('\n\n')
+        entry_blocks: List[tuple] = []   # (change_pct or None, text)
+        narrative_blocks: List[str] = []
+
+        for para in paragraphs:
+            stripped = para.strip()
+            if stripped.startswith('**'):
+                # Dimension entry block — extract Change%
+                m = re.search(r'-\s*Change:\s*([+-]?\d+(?:\.\d+)?)%', para)
+                pct = float(m.group(1)) if m else None
+                entry_blocks.append((pct, para))
+            else:
+                narrative_blocks.append(para)
+
+        if not entry_blocks:
+            return detail_body  # nothing to filter
+
+        # Filter by direction
+        if direction == 'highest_positive':
+            filtered = [(pct, t) for pct, t in entry_blocks if pct is not None and pct > 0]
+            filtered.sort(key=lambda x: x[0], reverse=True)
+        elif direction == 'highest_negative':
+            filtered = [(pct, t) for pct, t in entry_blocks if pct is not None and pct < 0]
+            filtered.sort(key=lambda x: x[0])  # most negative first
+        else:  # lowest
+            # Keep negative and zero entries; fall back to all if none exist
+            neg_zero = [(pct, t) for pct, t in entry_blocks if pct is None or pct <= 0]
+            pool = neg_zero if neg_zero else entry_blocks
+            # Sort ascending: most negative (lowest) first; unknowns at end
+            filtered = sorted(pool, key=lambda x: (x[0] is None, x[0] if x[0] is not None else 0))
+
+        if not filtered:
+            return detail_body  # safety fallback
+
+        result_parts = [t for _, t in filtered] + narrative_blocks
+        return '\n\n'.join(p for p in result_parts if p.strip())
 
     @staticmethod
     def _metrics_note(requested_metrics: Optional[List[str]]) -> str:

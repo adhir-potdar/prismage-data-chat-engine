@@ -10,6 +10,7 @@ keeping this module free of any domain knowledge.
 from __future__ import annotations
 import asyncio
 import logging
+import re
 from typing import Any, Dict, List, Optional
 
 from engine.embedding.date_utils import extract_dates_from_collection_name, format_date_readable
@@ -67,6 +68,7 @@ class Analyzer:
                     if collection_name is None and hasattr(record, 'collection_name'):
                         collection_name = record.collection_name
                 context = "\n\n".join(context_parts)
+                context = self._fix_divzero_in_context(context)
 
                 # Build date instruction from collection name
                 date_instruction = "period 1 value, period 2 value"
@@ -114,6 +116,39 @@ class Analyzer:
                 elapsed = asyncio.get_event_loop().time() - start
                 logger.error("[%s-B%d] Exception: %s", granularity.upper(), batch_index, exc)
                 return self._empty(granularity, batch_index, str(exc), elapsed)
+
+    @staticmethod
+    def _fix_divzero_in_context(context: str) -> str:
+        """Fix #DIV/0! change_percentage stored as 0.0 when period1_value is zero.
+
+        When the source CSV has change_percentage = #DIV/0! (period1 was zero),
+        safe_float() converts it to 0.0. This misleads the LLM into computing
+        infinity itself. We replace it with an explicit null marker so the LLM
+        uses change_absolute as the reported change value instead.
+        """
+        NULL_MARKER = (
+            'null (base period was zero; report the change_absolute value '
+            'as the change with no % symbol — never output infinity or ∞)'
+        )
+
+        def fix_section(text: str) -> str:
+            # Only fix when period1_value = 0 AND change_absolute is non-zero
+            if not re.search(r'period1_value(?:\s+with\s+value\s*|:\s*)0(?:\.0)?\b', text):
+                return text
+            m = re.search(r'change_absolute(?:\s+with\s+value\s*|:\s*)(\d+(?:\.\d+)?)', text)
+            if not m or float(m.group(1)) == 0.0:
+                return text
+            # Replace the misleading zero change_percentage with the null marker
+            text = re.sub(
+                r'(change_percentage(?:\s+with\s+value\s*|:\s*))0(?:\.0)?\b',
+                r'\g<1>' + NULL_MARKER,
+                text,
+            )
+            return text
+
+        # Split by "In section" markers to fix metric-level chunks individually
+        parts = re.split(r'(?=\bIn section\b)', context)
+        return ''.join(fix_section(p) for p in parts)
 
     @staticmethod
     def _metrics_instruction(requested_metrics: Optional[List[str]]) -> str:

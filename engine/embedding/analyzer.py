@@ -69,6 +69,13 @@ class Analyzer:
                         collection_name = record.collection_name
                 context = "\n\n".join(context_parts)
                 context = self._fix_divzero_in_context(context)
+                # Prepend unit annotation so LLM knows values are already in display units
+                context = (
+                    "[UNIT NOTE: All numeric values below are in their final display units. "
+                    "Percentage metrics (CTR, Fill Rate, etc.) already have ×100 applied: "
+                    "a stored value of 0.49 means 0.49%, NOT 49%. "
+                    "Do NOT re-multiply by 100.]\n\n"
+                ) + context
 
                 # Build date instruction from collection name
                 date_instruction = "period 1 value, period 2 value"

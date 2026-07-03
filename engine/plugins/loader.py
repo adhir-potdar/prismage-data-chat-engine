@@ -65,7 +65,9 @@ class PluginLoader:
         mode = manifest.get("mode", "sql").lower()
 
         if mode == "embedding":
-            return self._load_embedding_plugin(plugin_path, manifest)
+            # Allow caller to override the manifest's enable_charts setting
+            enable_charts_override = kwargs.pop("enable_charts", None)
+            return self._load_embedding_plugin(plugin_path, manifest, enable_charts_override)
 
         # ── SQL mode (default) ────────────────────────────────────────────────
         config_subdir = manifest.get("config_dir", "config/metadata")
@@ -94,14 +96,14 @@ class PluginLoader:
 
     # ── Embedding plugin loader ───────────────────────────────────────────────
 
-    def _load_embedding_plugin(self, plugin_path: Path, manifest: dict):
+    def _load_embedding_plugin(self, plugin_path: Path, manifest: dict, enable_charts_override=None):
         """Load an embedding-mode plugin and return an EmbeddingChain."""
         from engine.chains.embedding_chain import EmbeddingChain
 
         plugin_name = manifest.get("name", plugin_path.name)
         namespace = manifest.get("namespace", plugin_name)
         llm_model = manifest.get("llm_model", "gpt-4o-mini")
-        enable_charts = manifest.get("enable_charts", False)
+        enable_charts = enable_charts_override if enable_charts_override is not None else manifest.get("enable_charts", False)
 
         schema_path = plugin_path / "config" / "schema.json"
         prompts_path = plugin_path / "config" / "prompts.json"

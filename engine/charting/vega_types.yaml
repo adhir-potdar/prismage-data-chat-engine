@@ -1,0 +1,22 @@
+# Mapping from Trino/SQL column type prefixes to Vega-Lite field types.
+# Used by chart_generator to annotate table columns for the viz_spec LLM call.
+# Prefix matching: e.g. "decimal(10,2)" matches the "decimal" prefix → quantitative.
+# Types not listed here default to "nominal".
+
+varchar: nominal
+char: nominal
+text: nominal
+boolean: nominal
+integer: quantitative
+int: quantitative
+bigint: quantitative
+smallint: quantitative
+tinyint: quantitative
+double: quantitative
+real: quantitative
+float: quantitative
+decimal: quantitative
+numeric: quantitative
+date: temporal
+timestamp: temporal
+time: temporal

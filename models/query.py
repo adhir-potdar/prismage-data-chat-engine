@@ -22,6 +22,7 @@ class QueryResult(BaseModel):
     row_count: int = 0
     error: Optional[str] = None
     success: bool = True
+    col_types: dict[str, str] = Field(default_factory=dict)  # column → Trino type string
 
 
 class ExecutionResult(BaseModel):
@@ -53,4 +54,5 @@ class ChatResponse(BaseModel):
     raw_query_count: int = 0
     raw_row_count: int = 0
     merged_group_count: int = 0
-    query_results: list = Field(default_factory=list)   # [{channel, columns, rows, row_count}]
+    query_results: list = Field(default_factory=list)   # [{channel, columns, rows, row_count, col_types}]
+    vega_lite_spec: Optional[Any] = None                # Vega-Lite v5 spec dict (set when --chart)

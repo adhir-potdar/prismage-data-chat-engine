@@ -13,6 +13,7 @@ from engine.pipeline.question_parser import QuestionParser
 from engine.pipeline.query_builder import QueryBuilderStage
 from engine.pipeline.query_executor import QueryExecutor
 from engine.pipeline.nl_responder import NLResponder
+from engine.charting.chart_generator import generate_vega_spec
 
 logger = logging.getLogger(__name__)
 
@@ -45,12 +46,14 @@ class ChatbotChain:
         executor: QueryExecutor,
         responder: NLResponder,
         fallback_chain=None,   # LangChain create_sql_query_chain instance
+        enable_charts: bool = False,
     ):
         self.parser = parser
         self.query_builder = query_builder
         self.executor = executor
         self.responder = responder
         self.fallback_chain = fallback_chain
+        self.enable_charts = enable_charts
 
     # Meta-question phrases — intercepted before invoking the LLM
     _META_PHRASES = [
@@ -233,6 +236,28 @@ class ChatbotChain:
                     "row_count": r.row_count,
                 })
 
+            # ── STEP 5 (optional): Generate Vega-Lite chart spec ──────────────
+            # One chart per result group (e.g. primary + secondary each get a chart).
+            vega_specs = []
+            if self.enable_charts and query_results_data:
+                generate_fn = self._make_chart_generate_fn()
+                col_types_by_channel = {r.query.channel: r.col_types for r in successful}
+                for result_data in query_results_data:
+                    channel = result_data.get("channel")
+                    col_types = col_types_by_channel.get(channel) or {}
+                    try:
+                        spec = generate_vega_spec(
+                            question=question,
+                            columns=result_data["columns"],
+                            rows=result_data["rows"],
+                            generate_fn=generate_fn,
+                            col_types=col_types or None,
+                        )
+                        if spec:
+                            vega_specs.append({"channel": channel, "spec": spec})
+                    except Exception as exc:
+                        logger.warning("Chart spec generation failed for %s: %s", channel, exc)
+
             return ChatResponse(
                 question=question,
                 answer=answer,
@@ -240,6 +265,7 @@ class ChatbotChain:
                 detail=detail,
                 tabular=execution_result.programmatic_enumeration,
                 success=True,
+                vega_lite_spec=vega_specs or None,
                 sql_queries=[{"sql": q.sql, "table": q.table, "channel": q.channel} for q in queries],
                 total_rows=execution_result.total_rows,
                 used_fallback=used_fallback,
@@ -302,6 +328,18 @@ class ChatbotChain:
             result_cols[i] = kept
 
         return result_cols
+
+    def _make_chart_generate_fn(self):
+        """
+        Return a generate_fn(prompt) -> str for chart spec generation.
+        Binds the LLM to JSON output mode (OpenAI response_format) when supported,
+        so the response is always a valid JSON object without markdown fences.
+        """
+        try:
+            llm_json = self.responder.llm.bind(response_format={"type": "json_object"})
+            return lambda prompt: llm_json.invoke(prompt).content
+        except Exception:
+            return lambda prompt: self.responder.llm.invoke(prompt).content
 
     def _is_meta_question(self, question: str) -> bool:
         """True when the question is a help/meta query with no data intent."""

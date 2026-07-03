@@ -110,6 +110,9 @@ prismage-data-chat-engine/
 │   ├── chains/
 │   │   ├── chatbot_chain.py       # ChatbotChain — SQL pipeline (parse → SQL → NL answer)
 │   │   └── embedding_chain.py     # EmbeddingChain — vector search pipeline (parse → search → synthesize)
+│   ├── charting/
+│   │   ├── chart_generator.py     # generate_vega_spec() — LLM + Pydantic + post-processing heuristics
+│   │   └── vega_types.yaml        # Trino column type → Vega-Lite type mapping
 │   └── embedding/
 │       ├── question_parser.py     # Extracts metrics, dimensions, date range from question
 │       ├── collection_finder.py   # Finds matching vector collections by dimension + granularity + date
@@ -145,6 +148,13 @@ prismage-data-chat-engine/
 │   ├── test_rules_engine.py
 │   ├── test_query_builder.py
 │   └── test_pipeline.py
+│
+├── chart-preview/                 # Angular 20 UI for interactive Vega-Lite spec preview
+│   ├── src/app/
+│   │   ├── app.ts                 # Rendering logic — step-based sizing, debounce, resize
+│   │   ├── app.html               # Split-pane layout (JSON editor left, chart right)
+│   │   └── app.css                # Layout styles
+│   └── README.md                  # Setup and usage guide
 │
 ├── .env.example                   # All PRISMAGE_* environment variables documented
 ├── docs/DESIGN.md                 # Detailed architecture and design document
@@ -253,11 +263,17 @@ python -m api.chatbot --plugin my-sql-plugin
 # Named SQL plugin — also print the generated SQL for every question
 python -m api.chatbot --plugin my-sql-plugin --include-sql
 
+# Named SQL plugin — generate a Vega-Lite chart spec after every answer
+python -m api.chatbot --plugin my-sql-plugin --chart
+
+# Combine SQL + chart output
+python -m api.chatbot --plugin my-sql-plugin --include-sql --chart
+
 # Named embedding plugin — interactive session
 python -m api.chatbot --plugin my-embedding-plugin
 
-# Named embedding plugin — single question (non-interactive)
-python -m api.chatbot --plugin my-embedding-plugin --question "Which items are below threshold?"
+# Named embedding plugin — single question (non-interactive) with chart
+python -m api.chatbot --plugin my-embedding-plugin --question "Which items are below threshold?" --chart
 ```
 
 **CLI flags:**
@@ -266,9 +282,175 @@ python -m api.chatbot --plugin my-embedding-plugin --question "Which items are b
 |---|---|
 | `--plugin NAME` | Load a named plugin from `plugins/<NAME>/` |
 | `--include-sql` | Print the SQL query (or queries) generated for each question (SQL plugins only) |
-| `--question TEXT` | Run a single question and exit (embedding plugins) |
+| `--chart` | Generate and print a Vega-Lite v5 chart spec after each answer |
+| `--question TEXT` | Run a single question and exit (non-interactive mode) |
 
 When `--include-sql` is set, a **SQL QUERIES** block is printed after each response showing the exact SQL sent to the database, labelled by channel (primary / secondary). Useful for debugging parser output and verifying HAVING, GROUP BY, and WHERE clauses.
+
+When `--chart` is set, a **CHART SPEC (VEGA-LITE)** block is printed after the answer containing a complete Vega-Lite v5 JSON spec with `$schema` and `data.values` already injected. If the response has multiple result groups (e.g. primary and secondary channels), one chart spec is printed per group, each labelled with its channel. The spec can be pasted directly into the [chart-preview UI](chart-preview/README.md) at `http://localhost:8050` to render the chart interactively.
+
+**How chart generation works:**
+
+- The LLM generates a spec skeleton (mark + encoding only — no `$schema`, no `data`).
+- Pydantic validates the skeleton; `$schema` and `data.values` are injected programmatically.
+- Post-processing applies data-driven heuristics to fix common LLM mistakes:
+  - Flips vertical bars to horizontal when labels exceed 10 characters.
+  - Assigns the correct nominal field to y-axis vs. color using a within-group variation algorithm — no field names are hardcoded.
+  - Adds `yOffset` for side-by-side grouped bars when there are multiple nominal dimensions.
+  - Injects tooltip encoding for all columns.
+  - Enforces legend at bottom for all color/size/shape encodings.
+- For multi-metric data (`_val`/`_vol` column pairs), the engine folds wide-format rows into long format (`metric`, `amount`) and re-runs the LLM with the simplified schema before applying heuristics.
+- For period-comparison data (`period1_value`/`period2_value`), the engine folds into a `period`/`value` long format and re-runs if the LLM skips the fold transform.
+
+**Chart spec examples** — paste any of these into the chart-preview UI at `http://localhost:8050`:
+
+<details>
+<summary>i. Single metric — revenue by region (horizontal bar)</summary>
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Revenue by Region (MTD)",
+  "mark": { "type": "bar", "orient": "horizontal" },
+  "encoding": {
+    "y": { "field": "region", "type": "nominal" },
+    "x": { "field": "revenue", "type": "quantitative", "title": "Revenue (₹ Lakh)" },
+    "color": { "field": "region", "type": "nominal", "legend": { "orient": "bottom" } },
+    "tooltip": [
+      { "field": "region",  "type": "nominal" },
+      { "field": "revenue", "type": "quantitative" }
+    ]
+  },
+  "data": {
+    "values": [
+      { "region": "North",  "revenue": 42.3 },
+      { "region": "South",  "revenue": 38.7 },
+      { "region": "East",   "revenue": 27.1 },
+      { "region": "West",   "revenue": 51.5 },
+      { "region": "Central","revenue": 19.8 }
+    ]
+  }
+}
+```
+</details>
+
+<details>
+<summary>ii. Multi-metric — actual vs target vs last year side-by-side per product</summary>
+
+Wide-format `_val`/`_vol` pairs are automatically folded into `metric` + `amount` long format.
+The post-processing assigns `metric` to `color`+`yOffset` and the primary business dimension
+to the y-axis, giving one group of side-by-side bars per product.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Actual vs Target vs Last Year by Product",
+  "mark": { "type": "bar", "orient": "horizontal" },
+  "encoding": {
+    "y":       { "field": "product",  "type": "nominal" },
+    "x":       { "field": "amount",   "type": "quantitative", "title": "Units Sold" },
+    "color":   { "field": "metric",   "type": "nominal", "legend": { "orient": "bottom" } },
+    "yOffset": { "field": "metric",   "type": "nominal" },
+    "tooltip": [
+      { "field": "product", "type": "nominal" },
+      { "field": "metric",  "type": "nominal" },
+      { "field": "amount",  "type": "quantitative" }
+    ]
+  },
+  "data": {
+    "values": [
+      { "product": "Widget A", "metric": "actual", "amount": 320 },
+      { "product": "Widget A", "metric": "target", "amount": 400 },
+      { "product": "Widget A", "metric": "last_year", "amount": 290 },
+      { "product": "Widget B", "metric": "actual", "amount": 180 },
+      { "product": "Widget B", "metric": "target", "amount": 200 },
+      { "product": "Widget B", "metric": "last_year", "amount": 210 },
+      { "product": "Widget C", "metric": "actual", "amount": 540 },
+      { "product": "Widget C", "metric": "target", "amount": 500 },
+      { "product": "Widget C", "metric": "last_year", "amount": 480 }
+    ]
+  }
+}
+```
+</details>
+
+<details>
+<summary>iii. Period comparison — current vs last year MTD per region</summary>
+
+`period1_value`/`period2_value` columns are folded into `period`+`value` long format.
+Each region gets two side-by-side bars, one per period.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Revenue: Current MTD vs Last Year MTD by Region",
+  "mark": { "type": "bar", "orient": "horizontal" },
+  "encoding": {
+    "y":       { "field": "region", "type": "nominal" },
+    "x":       { "field": "value",  "type": "quantitative", "title": "Revenue (₹ Lakh)" },
+    "color":   { "field": "period", "type": "nominal", "legend": { "orient": "bottom" } },
+    "yOffset": { "field": "period", "type": "nominal" },
+    "tooltip": [
+      { "field": "region", "type": "nominal" },
+      { "field": "period", "type": "nominal" },
+      { "field": "value",  "type": "quantitative" }
+    ]
+  },
+  "data": {
+    "values": [
+      { "region": "North",  "period": "Jun 2025", "value": 42.3 },
+      { "region": "North",  "period": "Jun 2024", "value": 38.1 },
+      { "region": "South",  "period": "Jun 2025", "value": 38.7 },
+      { "region": "South",  "period": "Jun 2024", "value": 41.2 },
+      { "region": "East",   "period": "Jun 2025", "value": 27.1 },
+      { "region": "East",   "period": "Jun 2024", "value": 24.9 },
+      { "region": "West",   "period": "Jun 2025", "value": 51.5 },
+      { "region": "West",   "period": "Jun 2024", "value": 47.8 }
+    ]
+  }
+}
+```
+</details>
+
+<details>
+<summary>iv. Multi-dimension — city × region grouped bar</summary>
+
+When there are two nominal dimensions, the post-processing algorithm assigns the dimension with
+highest within-group variation to `color`+`yOffset` and the most-granular outer dimension to
+the y-axis rows. Here `region` (4 distinct) drives color and `city` (many distinct) drives rows,
+giving each city 1 bar per region.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "MTD Revenue by City and Region",
+  "mark": { "type": "bar", "orient": "horizontal" },
+  "encoding": {
+    "y":       { "field": "city",    "type": "nominal" },
+    "x":       { "field": "revenue", "type": "quantitative", "title": "Revenue (₹ Lakh)" },
+    "color":   { "field": "region",  "type": "nominal", "legend": { "orient": "bottom" } },
+    "yOffset": { "field": "region",  "type": "nominal" },
+    "tooltip": [
+      { "field": "city",    "type": "nominal" },
+      { "field": "region",  "type": "nominal" },
+      { "field": "revenue", "type": "quantitative" }
+    ]
+  },
+  "data": {
+    "values": [
+      { "city": "Mumbai",    "region": "West",  "revenue": 28.4 },
+      { "city": "Delhi",     "region": "North", "revenue": 22.1 },
+      { "city": "Bangalore", "region": "South", "revenue": 19.7 },
+      { "city": "Chennai",   "region": "South", "revenue": 14.3 },
+      { "city": "Pune",      "region": "West",  "revenue": 12.9 },
+      { "city": "Hyderabad", "region": "South", "revenue": 11.5 },
+      { "city": "Kolkata",   "region": "East",  "revenue": 10.8 },
+      { "city": "Ahmedabad", "region": "West",  "revenue":  9.6 }
+    ]
+  }
+}
+```
+</details>
 
 For embedding plugins, the output includes a **QUICK SUMMARY** (direct answer) and an **ANALYSIS (CONCISE)** section with per-granularity metric breakdowns, dimension values, period-over-period changes, and a data period indicator showing what date range was used.
 

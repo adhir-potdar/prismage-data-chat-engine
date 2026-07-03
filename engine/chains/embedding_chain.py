@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from models.query import ChatResponse
+from engine.charting.chart_generator import generate_vega_spec
 
 logger = logging.getLogger(__name__)
 
@@ -111,12 +112,32 @@ class EmbeddingChain:
             answer_text, filtered_collections, dimension = result
 
             summary, detail = self._split_answer(answer_text)
+
+            # Optional: generate Vega-Lite chart spec from parsed tabular data
+            vega_specs = []
+            if self.enable_charts and detail:
+                try:
+                    columns, rows = self._extract_tabular_from_detail(detail)
+                    if columns and rows:
+                        spec = generate_vega_spec(
+                            question=question,
+                            columns=columns,
+                            rows=rows,
+                            generate_fn=self._make_chart_generate_fn(),
+                            col_types=self._EMBEDDING_COL_TYPES,
+                        )
+                        if spec:
+                            vega_specs.append({"channel": "embedding", "spec": spec})
+                except Exception as exc:
+                    logger.warning("Chart spec generation failed: %s", exc, exc_info=True)
+
             return ChatResponse(
                 question=question,
                 answer=answer_text,
                 summary=summary,
                 detail=detail,
                 success=True,
+                vega_lite_spec=vega_specs or None,
                 step_timings={'total_s': round(elapsed, 2)},
             )
 
@@ -345,6 +366,117 @@ class EmbeddingChain:
                 sample = ', '.join(self._metric_names[:10])
                 issues.append(f"Supported metrics include: {sample}{'...' if len(self._metric_names) > 10 else ''}")
         return "\n".join(issues) if issues else "Unable to process your question."
+
+    # ── Chart helpers ─────────────────────────────────────────────────────
+
+    # Explicit Trino-style type hints for the synthetic embedding tabular columns.
+    # These map through vega_types.yaml → nominal/temporal/quantitative.
+    _EMBEDDING_COL_TYPES: dict = {
+        'dimension':     'varchar',
+        'metric':        'varchar',
+        'granularity':   'varchar',
+        'period1_date':  'date',
+        'period1_value': 'decimal',
+        'period2_date':  'date',
+        'period2_value': 'decimal',
+        'change_pct':    'decimal',
+    }
+
+    def _make_chart_generate_fn(self):
+        """
+        Return a generate_fn(prompt) -> str for chart spec generation.
+        Calls LLMService with temperature=0 for deterministic JSON output.
+        """
+        svc = self._llm_service
+
+        def generate_fn(prompt: str) -> str:
+            result = svc.generate_answer(prompt, '', '', 0.0, 2000)
+            return result.get('answer', '') if result.get('success') else ''
+
+        return generate_fn
+
+    @staticmethod
+    def _extract_tabular_from_detail(detail: str):
+        """
+        Parse embedding detail text into (columns, rows) for chart generation.
+
+        Handles blocks of the form:
+            **P_Website - CPM (DOD)**
+            - Dec 31, 2025: ₹14.51
+            - Jan 01, 2026: ₹36.30
+            - Change: +150.21%
+
+        Returns (columns, rows) where columns is a fixed list and rows is a
+        list of dicts. Returns ([], []) if no valid blocks are found.
+        """
+        import re
+
+        columns = [
+            'dimension', 'metric', 'granularity',
+            'period1_date', 'period1_value',
+            'period2_date', 'period2_value',
+            'change_pct',
+        ]
+        rows = []
+
+        header_re = re.compile(r'\*\*(.+?)\s*-\s*(.+?)\s*\((\w+)\)\*\*')
+        bullet_re = re.compile(r'^-\s+(.+?):\s*(.+)$', re.MULTILINE)
+        num_re = re.compile(r'[+-]?\d+(?:\.\d+)?')
+
+        for block in re.split(r'\n\n+', detail.strip()):
+            m = header_re.search(block)
+            if not m:
+                continue
+
+            dimension  = m.group(1).strip()
+            metric     = m.group(2).strip()
+            granularity = m.group(3).strip()
+
+            period_dates: list = []
+            period_values: list = []
+            change_pct = None
+
+            for label, raw_value in bullet_re.findall(block):
+                label = label.strip()
+                raw_value = raw_value.strip()
+
+                if label.lower() == 'change':
+                    nm = num_re.search(raw_value)
+                    if nm:
+                        sign = -1 if '-' in raw_value[:raw_value.index(nm.group())] else 1
+                        change_pct = sign * float(nm.group())
+                else:
+                    period_dates.append(label)
+                    cleaned = re.sub(r'[₹,%]', '', raw_value).replace(',', '').strip()
+                    try:
+                        period_values.append(float(cleaned))
+                    except ValueError:
+                        period_values.append(raw_value)
+
+            if len(period_dates) >= 2:
+                rows.append({
+                    'dimension':     dimension,
+                    'metric':        metric,
+                    'granularity':   granularity,
+                    'period1_date':  period_dates[0],
+                    'period1_value': period_values[0] if period_values else None,
+                    'period2_date':  period_dates[1],
+                    'period2_value': period_values[1] if len(period_values) > 1 else None,
+                    'change_pct':    change_pct,
+                })
+            elif len(period_dates) == 1:
+                rows.append({
+                    'dimension':     dimension,
+                    'metric':        metric,
+                    'granularity':   granularity,
+                    'period1_date':  None,
+                    'period1_value': None,
+                    'period2_date':  period_dates[0],
+                    'period2_value': period_values[0] if period_values else None,
+                    'change_pct':    change_pct,
+                })
+
+        return (columns, rows) if rows else ([], [])
 
     # ── Answer formatting ─────────────────────────────────────────────────
 

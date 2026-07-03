@@ -128,11 +128,26 @@ class QueryExecutor:
                 cursor = conn.execute(text(query.sql))
                 columns = list(cursor.keys())
                 rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+                # Capture Trino/DBAPI column type strings for chart annotation.
+                # cursor.cursor.description is a list of DBAPI Column objects;
+                # Trino returns the type as a string (e.g. "decimal(10,2)", "varchar").
+                col_types: dict[str, str] = {}
+                try:
+                    desc = cursor.cursor.description or []
+                    for item in desc:
+                        name = item[0]
+                        type_obj = item[1]
+                        col_types[name] = str(type_obj).lower() if type_obj else "varchar"
+                except Exception:
+                    pass  # type capture is best-effort; chart generator falls back to inference
+
             return QueryResult(
                 query=query,
                 columns=columns,
                 rows=rows,
                 row_count=len(rows),
+                col_types=col_types,
                 success=True,
             )
         except Exception as e:

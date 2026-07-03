@@ -45,6 +45,7 @@ def build_engine(
     embedding_model: str | None = None,
     embedding_cache_path: str | None = None,
     capabilities=None,
+    enable_charts: bool = False,
 ) -> ChatbotChain:
     """
     Build and wire the full Prismage engine from config.
@@ -148,7 +149,8 @@ def build_engine(
         from langchain_classic.chains.sql_database.query import create_sql_query_chain
         fallback = create_sql_query_chain(llm, db)
 
-    return ChatbotChain(parser, builder_stage, executor, responder, fallback)
+    return ChatbotChain(parser, builder_stage, executor, responder, fallback,
+                        enable_charts=enable_charts)
 
 
 def build_plugin_engine(
@@ -332,7 +334,7 @@ def _build_markdown_table(query_results: list) -> str:
     return "\n\n".join(sections)
 
 
-def _run_question(engine, question: str, include_sql: bool) -> None:
+def _run_question(engine, question: str, include_sql: bool, include_chart: bool = False) -> None:
     """Answer one question and print the result."""
     t_start = time.time()
     start_dt = datetime.now()
@@ -389,6 +391,17 @@ def _run_question(engine, question: str, include_sql: bool) -> None:
                 print(table_str)
                 print(_SEP)
 
+        if include_chart and response.vega_lite_spec:
+            import json as _json
+            for chart in response.vega_lite_spec:
+                channel = (chart.get("channel") or "").upper()
+                label = f"CHART SPEC (VEGA-LITE){' — ' + channel if channel else ''}"
+                print(f"\n{_SEP}")
+                print(label)
+                print(_SEP)
+                print(_json.dumps(chart["spec"], indent=2, ensure_ascii=False))
+                print(_SEP)
+
     print(f"\n{_SEP}")
     print(f"⏰ Completed at: {end_dt.strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"⏱️  Total time: {t_total:.2f}s")
@@ -406,6 +419,7 @@ def main():
     parser = argparse.ArgumentParser(description="Prismage Data Chat Engine — interactive CLI")
     parser.add_argument("--plugin", metavar="NAME", help="Plugin name to load (e.g. haldiram-sales)")
     parser.add_argument("--include-sql", action="store_true", help="Print the generated SQL queries for each question")
+    parser.add_argument("--chart", action="store_true", help="Generate and print a Vega-Lite v5 chart spec after each answer")
     parser.add_argument("--question", metavar="TEXT", help="Answer a single question and exit (non-interactive mode)")
     args = parser.parse_args()
 
@@ -427,18 +441,18 @@ def main():
 
         print(f"Loading plugin '{args.plugin}'...")
         try:
-            engine = build_plugin_engine(args.plugin)
+            engine = build_plugin_engine(args.plugin, enable_charts=args.chart)
         except Exception as e:
             print(f"ERROR: Failed to load plugin '{args.plugin}': {e}")
             sys.exit(1)
         label = args.plugin
     else:
-        engine = build_engine()
+        engine = build_engine(enable_charts=args.chart)
         label = "generic"
 
     # ── Single-question mode (--question "...") ───────────────────────────────
     if args.question:
-        _run_question(engine, args.question.strip(), args.include_sql)
+        _run_question(engine, args.question.strip(), args.include_sql, args.chart)
         return
 
     print(f"Prismage Data Chat Engine [{label}] — type 'exit' to quit.\n")
@@ -454,7 +468,7 @@ def main():
                 break
             if not question:
                 continue
-            _run_question(engine, question, args.include_sql)
+            _run_question(engine, question, args.include_sql, args.chart)
 
     except KeyboardInterrupt:
         print("\nBye!")

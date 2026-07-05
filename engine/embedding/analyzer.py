@@ -103,8 +103,8 @@ class Analyzer:
                     prompt,
                     context,
                     question,
-                    0.1,
-                    250,
+                    0.0,
+                    600,
                 )
 
                 elapsed = asyncio.get_event_loop().time() - start
@@ -135,7 +135,8 @@ class Analyzer:
         """
         NULL_MARKER = (
             'null (base period was zero; report the change_absolute value '
-            'as the change with no % symbol — never output infinity or ∞)'
+            'as a plain number with no % symbol and no currency symbol — '
+            'never output infinity or ∞)'
         )
 
         def fix_section(text: str) -> str:

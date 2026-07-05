@@ -81,7 +81,7 @@ class Synthesizer:
         )
 
         try:
-            result = await _run_sync(llm_service.generate_answer, prompt, '', question, 0.1, 300)
+            result = await _run_sync(llm_service.generate_answer, prompt, '', question, 0.0, 300)
             synthesis_time = asyncio.get_event_loop().time() - start
             if result['success']:
                 return AnalysisResult(granularity=granularity, granularity_name=gran_name,
@@ -141,7 +141,7 @@ class Synthesizer:
                 prompt,
                 all_insights,
                 question,
-                0.1,
+                0.0,
                 1500,
             )
             if result['success']:

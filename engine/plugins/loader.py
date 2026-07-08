@@ -83,6 +83,10 @@ class PluginLoader:
         )
 
         # Defer to the standard engine factory — no plugin-specific logic here
+        # Allow manifest to declare its own database_url (overridden by explicit arg)
+        if connection_string is None and "database_url" in manifest:
+            connection_string = manifest["database_url"]
+
         from api.chatbot import build_engine
         return build_engine(
             config_dir=config_dir,

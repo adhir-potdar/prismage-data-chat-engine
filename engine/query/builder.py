@@ -200,11 +200,18 @@ class QueryBuilder:
             if not self.registry.table_has_dimension(table, dim_name):
                 continue
             col = self.registry.get_db_column(dim_name)
+            dim = self.registry.get_dimension(dim_name)
             if col:
-                placeholders = ", ".join(self._NULL_PLACEHOLDERS)
-                conditions.append(
-                    f"({col} IS NOT NULL AND {col} NOT IN ({placeholders}))"
-                )
+                if dim and dim.skip_null_exclusion:
+                    # Integer/numeric columns — only check IS NOT NULL; string
+                    # placeholder literals ('-', 'N/A' etc.) cannot be stored
+                    # in non-string columns and cause TYPE_MISMATCH in ClickHouse.
+                    conditions.append(f"{col} IS NOT NULL")
+                else:
+                    placeholders = ", ".join(self._NULL_PLACEHOLDERS)
+                    conditions.append(
+                        f"({col} IS NOT NULL AND {col} NOT IN ({placeholders}))"
+                    )
 
         date_col = self.registry.get_date_column(table)
         table_meta = self.registry.get_table(table)

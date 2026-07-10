@@ -30,6 +30,7 @@ class Dimension(BaseModel):
     hierarchy_name: Optional[str] = None
     hierarchy_level: Optional[int] = None
     filter_mode: Optional[str] = None   # None/"exact" → = 'value'; "ilike" → ILIKE '%value%'
+    skip_null_exclusion: bool = False   # True for non-string columns (int/float) — skip NOT IN string placeholder filter
 
 
 class Metric(BaseModel):

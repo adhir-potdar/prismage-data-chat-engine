@@ -57,7 +57,9 @@ class HavingEngine:
         agg = self.registry.get_aggregate_fn(metric_name)
         if not col:
             return ""
-        return f"HAVING {agg}({col}) {op} (SELECT AVG({col}) FROM {table})"
+        # Use table-qualified column to prevent ClickHouse from confusing the
+        # column name with a SELECT alias of the same name (avoids ILLEGAL_AGGREGATION).
+        return f"HAVING {agg}({table}.{col}) {op} (SELECT AVG({col}) FROM {table})"
 
     def _build_gap_to_target(self, having: HavingConfig, table: str) -> str:
         if not having.conditions:
@@ -69,8 +71,8 @@ class HavingEngine:
         if not metric_col or not tgt_col:
             return ""
         return (
-            f"HAVING ABS(SUM({tgt_col}) - {agg}({metric_col})) > 0 "
-            f"ORDER BY ABS(SUM({tgt_col}) - {agg}({metric_col})) ASC"
+            f"HAVING ABS(SUM({table}.{tgt_col}) - {agg}({table}.{metric_col})) > 0 "
+            f"ORDER BY ABS(SUM({table}.{tgt_col}) - {agg}({table}.{metric_col})) ASC"
         )
 
     def _build_metric_comparison(self, having: HavingConfig, table: str) -> str:
@@ -82,7 +84,9 @@ class HavingEngine:
             agg2 = self.registry.get_aggregate_fn(cond.metric2)
             op = cond.operator
             if col1 and col2 and op in {"<", ">", "<=", ">="}:
-                clauses.append(f"{agg1}({col1}) {op} {agg2}({col2})")
+                # Use table-qualified column names to prevent ClickHouse from
+                # resolving bare column names as SELECT aliases (ILLEGAL_AGGREGATION).
+                clauses.append(f"{agg1}({table}.{col1}) {op} {agg2}({table}.{col2})")
 
         if not clauses:
             return ""

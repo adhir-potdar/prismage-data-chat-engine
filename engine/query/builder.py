@@ -242,7 +242,11 @@ class QueryBuilder:
             col = self.registry.get_metric_column(metric)
             agg = self.registry.get_aggregate_fn(metric)
             if col and agg:
-                return f"ORDER BY {agg}({col}) {intent.sort.direction}"
+                # Use the SELECT alias rather than repeating the aggregation expression.
+                # Re-wrapping the alias in the aggregate (e.g. SUM(SUM(col))) is
+                # illegal in ClickHouse and redundant in PostgreSQL — both support
+                # ORDER BY alias defined in SELECT.
+                return f"ORDER BY {metric}{suffix} {intent.sort.direction}"
             # Formula / percentage metric — use SELECT alias
             return f"ORDER BY {metric}{suffix} {intent.sort.direction}"
 
